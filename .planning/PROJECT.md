@@ -24,9 +24,12 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 - [x] Rust CLI 分发：crates.io + GitHub Releases 预编译二进制 — `Validated in Phase 01`
 - [x] MCP Server 集成：通过 MCP 协议暴露 WTCD 核心能力给 Agent — `Validated in Phase 999.1`
 
-### Active (v2)
+### Active (v0.1.1)
 
-- [ ] 多语言适配器（Python, Go）
+**Milestone v0.1.1: Multi-Language & Knowledge Layer**
+
+- [ ] Python 语言适配器
+- [ ] Go 语言适配器
 - [ ] 模块级镜像聚合
 - [ ] 知识层文档生成
 
@@ -90,7 +93,7 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 
 This document evolves at phase transitions and milestone boundaries.
 
-**Current State**: Milestone v1.0 complete — 5 phases, 8 crates, 160 tests, 38/38 requirements satisfied. v1 交付了完整的解析→镜像→漂移检测→路由索引→MCP Server 管线。
+**Current State**: Milestone v0.1.1 started — extending to multi-language support (Python, Go) and knowledge layer generation.
 
 **After each milestone** (via `/gsd-complete-milestone`):
 1. Full review of all sections
@@ -99,4 +102,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-21 after v1.0 milestone completion*
+*Last updated: 2026-03-21 after v0.1.1 milestone started*
