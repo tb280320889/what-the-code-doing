@@ -19,7 +19,9 @@ pub struct AdapterRegistry {
 
 impl AdapterRegistry {
     pub fn new() -> Self {
-        Self { adapters: Vec::new() }
+        Self {
+            adapters: Vec::new(),
+        }
     }
 
     pub fn register(&mut self, adapter: Box<dyn LanguageAdapter>) {

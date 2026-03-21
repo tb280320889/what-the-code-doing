@@ -10,10 +10,10 @@ Requirements for initial release (M0-M3). Each maps to roadmap phases.
 ### Core Engine
 
 - [x] **CORE-01**: CLI 可通过 `cargo install anrsm` 或 GitHub Releases 安装为单二进制
-- [ ] **CORE-02**: CLI 支持 `anrsm init` 命令，在目标仓库初始化 ANRSM 配置和目录结构
-- [ ] **CORE-03**: CLI 支持 `anrsm run` 命令，对目标仓库执行全量扫描和镜像生成
-- [ ] **CORE-04**: CLI 支持 `anrsm check` 命令，检测当前变更集的镜像漂移
-- [ ] **CORE-05**: CLI 支持 `anrsm route <task>` 命令，将任务路由到候选模块和文件
+- [x] **CORE-02**: CLI 支持 `anrsm init` 命令，在目标仓库初始化 ANRSM 配置和目录结构 — Phase 1
+- [x] **CORE-03**: CLI 支持 `anrsm run` 命令，对目标仓库执行全量扫描和镜像生成 — Phase 1+2
+- [x] **CORE-04**: CLI 支持 `anrsm check` 命令，检测当前变更集的镜像漂移 — Phase 3
+- [x] **CORE-05**: CLI 支持 `anrsm route <task>` 命令，将任务路由到候选模块和文件 — Phase 4
 - [x] **CORE-06**: CLI 输出 JSON 格式，可被 Agent 直接解析
 
 ### Scope Manager
@@ -33,44 +33,44 @@ Requirements for initial release (M0-M3). Each maps to roadmap phases.
 
 ### Mirror Generator
 
-- [ ] **MIRR-01**: 生成符合 `mirror-header.schema.json` 的文件镜像（YAML Front Matter + Markdown 正文）
-- [ ] **MIRR-02**: 镜像正文包含规范定义的 8 个标准段落（职责、对外契约、输入与前置条件、状态与控制流、副作用与外部依赖、关键不变量与风险、变更影响、何时必须展开源码）
-- [ ] **MIRR-03**: 镜像路径按规则映射：`mirror/file/<source_relative_path>.md`
-- [ ] **MIRR-04**: 计算 source_fingerprint（基于源码内容的 SHA-256）
-- [ ] **MIRR-05**: 计算 semantic_fingerprint（基于结构化语义对象的 SHA-256，排除非语义噪声）
+- [x] **MIRR-01**: 生成符合 `mirror-header.schema.json` 的文件镜像（YAML Front Matter + Markdown 正文） — Phase 2
+- [x] **MIRR-02**: 镜像正文包含规范定义的 8 个标准段落（职责、对外契约、输入与前置条件、状态与控制流、副作用与外部依赖、关键不变量与风险、变更影响、何时必须展开源码） — Phase 2
+- [x] **MIRR-03**: 镜像路径按规则映射：`mirror/file/<source_relative_path>.md` — Phase 2
+- [x] **MIRR-04**: 计算 source_fingerprint（基于源码内容的 SHA-256） — Phase 2
+- [x] **MIRR-05**: 计算 semantic_fingerprint（基于结构化语义对象的 SHA-256，排除非语义噪声） — Phase 2
 
 ### Fingerprint Engine
 
-- [ ] **FP-01**: source_fingerprint 在源码任何文本变化时变化
-- [ ] **FP-02**: semantic_fingerprint 在纯格式化/注释/空白变化时保持稳定
-- [ ] **FP-03**: 指纹算法可版本化，支持 `fp_version` 字段
+- [x] **FP-01**: source_fingerprint 在源码任何文本变化时变化 — Phase 2
+- [x] **FP-02**: semantic_fingerprint 在纯格式化/注释/空白变化时保持稳定 — Phase 2
+- [x] **FP-03**: 指纹算法可版本化，支持 `fp_version` 字段 — Phase 2
 
 ### Drift Detection
 
-- [ ] **DRFT-01**: 基于 Git diff 获取变更集
-- [ ] **DRFT-02**: 区分 C0（Non-material）、C1（Local Material）、C2（Contract Material）、C3（Systemic Material）四类变更
-- [ ] **DRFT-03**: 输出符合 `drift-report.schema.json` 的漂移报告
-- [ ] **DRFT-04**: 对变更文件的受影响邻域进行扩展分析
+- [x] **DRFT-01**: 基于 Git diff 获取变更集 — Phase 3
+- [x] **DRFT-02**: 区分 C0（Non-material）、C1（Local Material）、C2（Contract Material）、C3（Systemic Material）四类变更 — Phase 3
+- [x] **DRFT-03**: 输出符合 `drift-report.schema.json` 的漂移报告 — Phase 3
+- [x] **DRFT-04**: 对变更文件的受影响邻域进行扩展分析 — Phase 3
 
 ### CI Gate
 
-- [ ] **GATE-01**: 支持 pre-commit hook 模式
-- [ ] **GATE-02**: 支持 `anrsm gate` 命令，可被 CI pipeline 调用
-- [ ] **GATE-03**: 可配置的门禁策略（fail_on / warn_on 按漂移级别）
-- [ ] **GATE-04**: 输出标准失败码（ANRSM-001 到 ANRSM-010）
-- [ ] **GATE-05**: 初期支持 warn-only 模式，避免误报导致 adoption 失败
+- [x] **GATE-01**: 支持 pre-commit hook 模式 — Phase 3
+- [x] **GATE-02**: 支持 `anrsm gate` 命令，可被 CI pipeline 调用 — Phase 3
+- [x] **GATE-03**: 可配置的门禁策略（fail_on / warn_on 按漂移级别） — Phase 3
+- [x] **GATE-04**: 输出标准失败码（ANRSM-001 到 ANRSM-010） — Phase 3
+- [x] **GATE-05**: 初期支持 warn-only 模式，避免误报导致 adoption 失败 — Phase 3
 
 ### Routing Index
 
-- [ ] **RTIX-01**: 生成 routing_index，包含 artifact_id、module_id、semantic_keywords、exported_symbols
-- [ ] **RTIX-02**: `anrsm route <task>` 命令从自然语言任务映射到候选模块和文件
-- [ ] **RTIX-03**: 支持 top_k 限制返回数量
+- [x] **RTIX-01**: 生成 routing_index，包含 artifact_id、module_id、semantic_keywords、exported_symbols — Phase 4
+- [x] **RTIX-02**: `anrsm route <task>` 命令从自然语言任务映射到候选模块和文件 — Phase 4
+- [x] **RTIX-03**: 支持 top_k 限制返回数量 — Phase 4
 
 ### Incremental Update
 
-- [ ] **INCR-01**: 基于 Git diff 驱动的增量更新，不默认全量重扫
-- [ ] **INCR-02**: 仅重新解析变更文件及其受影响邻域
-- [ ] **INCR-03**: 支持 `anrsm run --full` 触发全量重建
+- [x] **INCR-01**: 基于 Git diff 驱动的增量更新，不默认全量重扫 — Phase 3
+- [x] **INCR-02**: 仅重新解析变更文件及其受影响邻域 — Phase 3
+- [x] **INCR-03**: 支持 `anrsm run --full` 触发全量重建 — Phase 3
 
 ## v2 Requirements
 
@@ -116,48 +116,48 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1: Foundation | Complete |
-| CORE-02 | Phase 1: Foundation | Pending |
-| CORE-03 | Phase 1: Foundation | Pending |
-| CORE-04 | Phase 4: Index + Route | Pending |
-| CORE-05 | Phase 4: Index + Route | Pending |
-| CORE-06 | Phase 1: Foundation | Complete |
-| SCOP-01 | Phase 1: Foundation | ✅ Complete (01-02) |
-| SCOP-02 | Phase 1: Foundation | ✅ Complete (01-02) |
-| SCOP-03 | Phase 1: Foundation | ✅ Complete (01-02) |
-| LANG-01 | Phase 1: Foundation | Complete |
-| LANG-02 | Phase 1: Foundation | Complete |
-| LANG-03 | Phase 1: Foundation | Complete |
-| LANG-04 | Phase 1: Foundation | Complete |
-| LANG-05 | Phase 1: Foundation | Complete |
-| LANG-06 | Phase 1: Foundation | Complete |
-| MIRR-01 | Phase 2: Mirror + Fingerprint | Pending |
-| MIRR-02 | Phase 2: Mirror + Fingerprint | Pending |
-| MIRR-03 | Phase 2: Mirror + Fingerprint | Pending |
-| MIRR-04 | Phase 2: Mirror + Fingerprint | Pending |
-| MIRR-05 | Phase 2: Mirror + Fingerprint | Pending |
-| FP-01 | Phase 2: Mirror + Fingerprint | Pending |
-| FP-02 | Phase 2: Mirror + Fingerprint | Pending |
-| FP-03 | Phase 2: Mirror + Fingerprint | Pending |
-| DRFT-01 | Phase 3: Drift + Gate | Pending |
-| DRFT-02 | Phase 3: Drift + Gate | Pending |
-| DRFT-03 | Phase 3: Drift + Gate | Pending |
-| DRFT-04 | Phase 3: Drift + Gate | Pending |
-| GATE-01 | Phase 3: Drift + Gate | Pending |
-| GATE-02 | Phase 3: Drift + Gate | Pending |
-| GATE-03 | Phase 3: Drift + Gate | Pending |
-| GATE-04 | Phase 3: Drift + Gate | Pending |
-| GATE-05 | Phase 3: Drift + Gate | Pending |
-| RTIX-01 | Phase 4: Index + Route | Pending |
-| RTIX-02 | Phase 4: Index + Route | Pending |
-| RTIX-03 | Phase 4: Index + Route | Pending |
-| INCR-01 | Phase 3: Drift + Gate | Pending |
-| INCR-02 | Phase 3: Drift + Gate | Pending |
-| INCR-03 | Phase 3: Drift + Gate | Pending |
+| CORE-01 | Phase 1: Foundation | ✅ Complete |
+| CORE-02 | Phase 1: Foundation | ✅ Complete |
+| CORE-03 | Phase 1+2: Foundation + Mirror | ✅ Complete |
+| CORE-04 | Phase 3: Drift + Gate | ✅ Complete |
+| CORE-05 | Phase 4: Index + Route | ✅ Complete |
+| CORE-06 | Phase 1: Foundation | ✅ Complete |
+| SCOP-01 | Phase 1: Foundation | ✅ Complete |
+| SCOP-02 | Phase 1: Foundation | ✅ Complete |
+| SCOP-03 | Phase 1: Foundation | ✅ Complete |
+| LANG-01 | Phase 1: Foundation | ✅ Complete |
+| LANG-02 | Phase 1: Foundation | ✅ Complete |
+| LANG-03 | Phase 1: Foundation | ✅ Complete |
+| LANG-04 | Phase 1: Foundation | ✅ Complete |
+| LANG-05 | Phase 1: Foundation | ✅ Complete |
+| LANG-06 | Phase 1: Foundation | ✅ Complete |
+| MIRR-01 | Phase 2: Mirror + Fingerprint | ✅ Complete |
+| MIRR-02 | Phase 2: Mirror + Fingerprint | ✅ Complete |
+| MIRR-03 | Phase 2: Mirror + Fingerprint | ✅ Complete |
+| MIRR-04 | Phase 2: Mirror + Fingerprint | ✅ Complete |
+| MIRR-05 | Phase 2: Mirror + Fingerprint | ✅ Complete |
+| FP-01 | Phase 2: Mirror + Fingerprint | ✅ Complete |
+| FP-02 | Phase 2: Mirror + Fingerprint | ✅ Complete |
+| FP-03 | Phase 2: Mirror + Fingerprint | ✅ Complete |
+| DRFT-01 | Phase 3: Drift + Gate | ✅ Complete |
+| DRFT-02 | Phase 3: Drift + Gate | ✅ Complete |
+| DRFT-03 | Phase 3: Drift + Gate | ✅ Complete |
+| DRFT-04 | Phase 3: Drift + Gate | ✅ Complete |
+| GATE-01 | Phase 3: Drift + Gate | ✅ Complete |
+| GATE-02 | Phase 3: Drift + Gate | ✅ Complete |
+| GATE-03 | Phase 3: Drift + Gate | ✅ Complete |
+| GATE-04 | Phase 3: Drift + Gate | ✅ Complete |
+| GATE-05 | Phase 3: Drift + Gate | ✅ Complete |
+| RTIX-01 | Phase 4: Index + Route | ✅ Complete |
+| RTIX-02 | Phase 4: Index + Route | ✅ Complete |
+| RTIX-03 | Phase 4: Index + Route | ✅ Complete |
+| INCR-01 | Phase 3: Drift + Gate | ✅ Complete |
+| INCR-02 | Phase 3: Drift + Gate | ✅ Complete |
+| INCR-03 | Phase 3: Drift + Gate | ✅ Complete |
 
 **Coverage:**
 - v1 requirements: 38 total
-- Mapped to phases: 38
+- Satisfied: 38/38 (100%)
 - Unmapped: 0 ✓
 
 ---
