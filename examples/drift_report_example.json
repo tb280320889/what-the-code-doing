@@ -1,0 +1,66 @@
+{
+  "report_version": 1,
+  "report_id": "drift:2026-03-20T10:44:12Z:1a2b3c4..5d6e7f8",
+  "repo_commit_before": "1a2b3c4",
+  "repo_commit_after": "5d6e7f8",
+  "generated_at": "2026-03-20T10:44:12Z",
+  "drift_level": "blocking",
+  "changed_files": [
+    "src/auth/login.ts",
+    "src/core/auth/session.ts"
+  ],
+  "affected_artifacts": [
+    {
+      "artifact_id": "file_mirror:src/auth/login.ts",
+      "before_freshness": "fresh",
+      "after_freshness": "stale",
+      "drift_level": "material",
+      "reason": "导出函数 login 的错误映射和副作用时机发生变化",
+      "recommended_action": "重新生成文件镜像并扩展检查登录页面与契约测试"
+    },
+    {
+      "artifact_id": "module_mirror:auth",
+      "before_freshness": "fresh",
+      "after_freshness": "stale",
+      "drift_level": "blocking",
+      "reason": "鉴权失败路径与会话建立边界变化影响模块责任描述",
+      "recommended_action": "更新模块镜像并重新验证相关依赖邻域"
+    }
+  ],
+  "material_changes": [
+    {
+      "change_class": "C2",
+      "source_path": "src/auth/login.ts",
+      "summary": "登录失败错误映射从本地分类改为后端原样透传，改变了对外错误契约",
+      "evidence": [
+        "exported symbol: login",
+        "error mapping branch changed",
+        "related tests impacted"
+      ]
+    },
+    {
+      "change_class": "C1",
+      "source_path": "src/core/auth/session.ts",
+      "summary": "会话建立时机后移，改变了本地副作用顺序",
+      "evidence": [
+        "session write moved after remote response validation"
+      ]
+    }
+  ],
+  "policy_result": {
+    "status": "fail",
+    "failed_rules": [
+      "pull_request.fail_on.material",
+      "pull_request.fail_on_invalid"
+    ],
+    "failure_codes": [
+      "ANRSM-005",
+      "ANRSM-006"
+    ],
+    "recommendations": [
+      "regenerate affected file mirrors",
+      "refresh module mirror auth",
+      "rerun drift analysis after mirror update"
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+# ANRSM v1 configuration example
+version: 1
+repo_root: .
+
+source_roots:
+  - src
+  - apps
+  - packages
+  - tests
+
+exclude_patterns:
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/.next/**"
+  - "**/coverage/**"
+  - "**/*.lock"
+  - "**/*.snap"
+
+module_rules:
+  - id: auth
+    include:
+      - "src/auth/**"
+      - "packages/auth/**"
+  - id: billing
+    include:
+      - "src/billing/**"
+  - id: web/home
+    include:
+      - "apps/web/pages/home/**"
+
+language_adapters:
+  typescript:
+    enabled: true
+    parser: tsc
+    confidence_default: high
+  python:
+    enabled: false
+
+policies:
+  pre_commit:
+    fail_on:
+      - blocking
+    warn_on:
+      - material
+    require_file_mirror: true
+  pull_request:
+    fail_on:
+      - material
+      - blocking
+    fail_on_invalid: true
+    fail_on_unknown_for:
+      - src/auth/**
+      - src/billing/**
+  release:
+    fail_on:
+      - material
+      - blocking
+    fail_on_invalid: true
+    fail_on_unknown: true
+
+routing:
+  top_k_modules: 6
+  top_k_files: 12
+  neighbor_depth: 1
+  include_tests_for_contract_changes: true
+
+knowledge:
+  enabled: false
+  categories:
+    - architecture
+    - features
+    - operations
+    - onboarding
+
+performance:
+  incremental_mode: true
+  full_rebuild_on:
+    - adapter_version_change
+    - fingerprint_algorithm_change
+    - module_rules_change
