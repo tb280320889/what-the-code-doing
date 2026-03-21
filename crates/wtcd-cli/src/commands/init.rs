@@ -28,6 +28,13 @@ mirror:
 
 output:
   format: json
+
+gate:
+  fail_on: []
+  warn_on:
+    - when: C2
+    - when: C3
+  systemic_threshold: 5
 "#;
 
 pub fn run_init(repo_root: &Path) -> Result<()> {

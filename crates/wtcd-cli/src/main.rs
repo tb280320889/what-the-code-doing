@@ -20,14 +20,21 @@ enum Commands {
     /// Initialize wtcd configuration in current repo
     Init {},
     /// Run analysis on scoped files
-    Run {},
+    Run {
+        /// Force full rebuild (skip incremental optimization)
+        #[arg(long)]
+        full: bool,
+    },
+    /// Check for drift between source and mirrors
+    Check {},
 }
 
 fn main() {
     let cli = Cli::parse();
     let result = match cli.command {
         Commands::Init {} => commands::init::run_init(&cli.root),
-        Commands::Run {} => commands::run::run_analysis(&cli.root),
+        Commands::Run { full } => commands::run::run_analysis(&cli.root, full),
+        Commands::Check {} => commands::check::run_check(&cli.root),
     };
 
     if let Err(e) = result {

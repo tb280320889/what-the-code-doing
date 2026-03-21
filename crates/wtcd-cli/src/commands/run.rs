@@ -1,10 +1,11 @@
 use crate::output::format_json;
+use std::collections::HashSet;
 use std::path::Path;
 use std::time::Instant;
 use wtcd_adapters::register_all_adapters;
 use wtcd_core::types::*;
 
-pub fn run_analysis(repo_root: &Path) -> wtcd_core::error::Result<()> {
+pub fn run_analysis(repo_root: &Path, full: bool) -> wtcd_core::error::Result<()> {
     let overall_start = Instant::now();
 
     // 1. Load config (D-10: must have anrsm.yaml)
@@ -14,12 +15,73 @@ pub fn run_analysis(repo_root: &Path) -> wtcd_core::error::Result<()> {
     let registry = register_all_adapters()
         .map_err(|e| wtcd_core::error::WtcdError::ConfigError(e.to_string()))?;
 
-    // 3. Scan files
-    let files = wtcd_scope::scan(repo_root, &config.scope)?;
+    // 3. Determine files to parse
+    let files_to_parse: Vec<std::path::PathBuf> = if full {
+        // Full mode: scan all files (existing behavior, INCR-03)
+        wtcd_scope::scan(repo_root, &config.scope)?
+    } else {
+        // Incremental mode: diff → changed + neighbors (INCR-01, INCR-02)
+        match wtcd_diff::git_diff::diff_working_tree_vs_head(repo_root) {
+            Ok(diff) if !diff.is_clean => {
+                // Get all scoped files (for dep graph)
+                let all_files = wtcd_scope::scan(repo_root, &config.scope)?;
+
+                // Parse all files to build dep graph
+                let mut all_results = Vec::new();
+                for fp in &all_files {
+                    let relative = fp
+                        .strip_prefix(repo_root)
+                        .unwrap_or(fp)
+                        .to_string_lossy()
+                        .to_string();
+                    let adapter = registry.find_adapter(&relative);
+                    let result = match adapter {
+                        Some(a) => match std::fs::read_to_string(fp) {
+                            Ok(s) => a.parse(&s, &relative),
+                            Err(_) => continue,
+                        },
+                        None => continue,
+                    };
+                    all_results.push(result);
+                }
+
+                // Build reverse dep graph
+                let dep_graph = wtcd_core::depgraph::ReverseDepGraph::build(&all_results);
+
+                // Changed files from diff
+                let mut changed_set = HashSet::new();
+                for cf in &diff.changed_files {
+                    changed_set.insert(cf.path.clone());
+                }
+
+                // Expand to neighbors
+                let neighbors = dep_graph.expand_affected(&changed_set);
+                let mut parse_set = changed_set;
+                parse_set.extend(neighbors);
+
+                // Filter all_files to only parse_set
+                all_files
+                    .into_iter()
+                    .filter(|fp| {
+                        let relative = fp
+                            .strip_prefix(repo_root)
+                            .unwrap_or(fp)
+                            .to_string_lossy()
+                            .to_string();
+                        parse_set.contains(&relative)
+                    })
+                    .collect()
+            }
+            _ => {
+                // Clean working tree or diff failed — fall back to full
+                wtcd_scope::scan(repo_root, &config.scope)?
+            }
+        }
+    };
 
     // 4. Parse each file
     let mut file_results = Vec::new();
-    for file_path in &files {
+    for file_path in &files_to_parse {
         let relative = file_path
             .strip_prefix(repo_root)
             .unwrap_or(file_path)
@@ -55,8 +117,9 @@ pub fn run_analysis(repo_root: &Path) -> wtcd_core::error::Result<()> {
         file_results.push(result);
     }
 
-    // 5. Get source commit hash
-    let source_commit = get_git_commit_hash(repo_root).unwrap_or_else(|_| "unknown".to_string());
+    // 5. Get source commit hash (using gix via wtcd-diff)
+    let source_commit =
+        wtcd_diff::git_diff::get_head_commit(repo_root).unwrap_or_else(|_| "unknown".to_string());
 
     // 6. Generate mirror files
     let mirror_config = config.mirror.clone().unwrap_or_default();
@@ -64,7 +127,7 @@ pub fn run_analysis(repo_root: &Path) -> wtcd_core::error::Result<()> {
 
     let mut mirror_generated = 0usize;
     let mut mirror_errors = 0usize;
-    for (file_path, file_result) in files.iter().zip(file_results.iter()) {
+    for (file_path, file_result) in files_to_parse.iter().zip(file_results.iter()) {
         if file_result.confidence == ConfidenceBand::None {
             continue; // Skip files that couldn't be parsed
         }
@@ -97,7 +160,7 @@ pub fn run_analysis(repo_root: &Path) -> wtcd_core::error::Result<()> {
     }
 
     // 7. Clean up orphan mirrors
-    let source_paths: Vec<String> = files
+    let source_paths: Vec<String> = files_to_parse
         .iter()
         .map(|f| {
             f.strip_prefix(repo_root)
@@ -149,20 +212,6 @@ pub fn run_analysis(repo_root: &Path) -> wtcd_core::error::Result<()> {
     );
 
     Ok(())
-}
-
-fn get_git_commit_hash(repo_root: &Path) -> anyhow::Result<String> {
-    let output = std::process::Command::new("git")
-        .args(["rev-parse", "--short", "HEAD"])
-        .current_dir(repo_root)
-        .output()
-        .map_err(|e| anyhow::anyhow!("Git command failed: {}", e))?;
-
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
-    } else {
-        Ok("unknown".to_string())
-    }
 }
 
 fn derive_module_id(relative_path: &str, source_roots: &[String]) -> String {
