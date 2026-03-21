@@ -1,0 +1,18 @@
+[package]
+name = "wtcd-mcp"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+rmcp = { version = "1.2.0", features = ["server", "transport-io"] }
+tokio = { version = "1", features = ["full"] }
+schemars = "1.1.0"
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+wtcd-core = { workspace = true }
+wtcd-scope = { workspace = true }
+wtcd-adapters = { workspace = true }
