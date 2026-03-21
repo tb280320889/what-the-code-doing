@@ -116,48 +116,48 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1 | Pending |
-| CORE-02 | Phase 1 | Pending |
-| CORE-03 | Phase 2 | Pending |
-| CORE-04 | Phase 3 | Pending |
-| CORE-05 | Phase 4 | Pending |
-| CORE-06 | Phase 2 | Pending |
-| SCOP-01 | Phase 1 | Pending |
-| SCOP-02 | Phase 1 | Pending |
-| SCOP-03 | Phase 1 | Pending |
-| LANG-01 | Phase 2 | Pending |
-| LANG-02 | Phase 2 | Pending |
-| LANG-03 | Phase 2 | Pending |
-| LANG-04 | Phase 2 | Pending |
-| LANG-05 | Phase 2 | Pending |
-| LANG-06 | Phase 2 | Pending |
-| MIRR-01 | Phase 2 | Pending |
-| MIRR-02 | Phase 2 | Pending |
-| MIRR-03 | Phase 2 | Pending |
-| MIRR-04 | Phase 2 | Pending |
-| MIRR-05 | Phase 3 | Pending |
-| FP-01 | Phase 2 | Pending |
-| FP-02 | Phase 3 | Pending |
-| FP-03 | Phase 3 | Pending |
-| DRFT-01 | Phase 3 | Pending |
-| DRFT-02 | Phase 3 | Pending |
-| DRFT-03 | Phase 3 | Pending |
-| DRFT-04 | Phase 3 | Pending |
-| GATE-01 | Phase 3 | Pending |
-| GATE-02 | Phase 3 | Pending |
-| GATE-03 | Phase 3 | Pending |
-| GATE-04 | Phase 3 | Pending |
-| GATE-05 | Phase 3 | Pending |
-| RTIX-01 | Phase 4 | Pending |
-| RTIX-02 | Phase 4 | Pending |
-| RTIX-03 | Phase 4 | Pending |
-| INCR-01 | Phase 3 | Pending |
-| INCR-02 | Phase 3 | Pending |
-| INCR-03 | Phase 3 | Pending |
+| CORE-01 | Phase 1: Foundation | Pending |
+| CORE-02 | Phase 1: Foundation | Pending |
+| CORE-03 | Phase 1: Foundation | Pending |
+| CORE-04 | Phase 4: Index + Route | Pending |
+| CORE-05 | Phase 4: Index + Route | Pending |
+| CORE-06 | Phase 1: Foundation | Pending |
+| SCOP-01 | Phase 1: Foundation | Pending |
+| SCOP-02 | Phase 1: Foundation | Pending |
+| SCOP-03 | Phase 1: Foundation | Pending |
+| LANG-01 | Phase 1: Foundation | Pending |
+| LANG-02 | Phase 1: Foundation | Pending |
+| LANG-03 | Phase 1: Foundation | Pending |
+| LANG-04 | Phase 1: Foundation | Pending |
+| LANG-05 | Phase 1: Foundation | Pending |
+| LANG-06 | Phase 1: Foundation | Pending |
+| MIRR-01 | Phase 2: Mirror + Fingerprint | Pending |
+| MIRR-02 | Phase 2: Mirror + Fingerprint | Pending |
+| MIRR-03 | Phase 2: Mirror + Fingerprint | Pending |
+| MIRR-04 | Phase 2: Mirror + Fingerprint | Pending |
+| MIRR-05 | Phase 2: Mirror + Fingerprint | Pending |
+| FP-01 | Phase 2: Mirror + Fingerprint | Pending |
+| FP-02 | Phase 2: Mirror + Fingerprint | Pending |
+| FP-03 | Phase 2: Mirror + Fingerprint | Pending |
+| DRFT-01 | Phase 3: Drift + Gate | Pending |
+| DRFT-02 | Phase 3: Drift + Gate | Pending |
+| DRFT-03 | Phase 3: Drift + Gate | Pending |
+| DRFT-04 | Phase 3: Drift + Gate | Pending |
+| GATE-01 | Phase 3: Drift + Gate | Pending |
+| GATE-02 | Phase 3: Drift + Gate | Pending |
+| GATE-03 | Phase 3: Drift + Gate | Pending |
+| GATE-04 | Phase 3: Drift + Gate | Pending |
+| GATE-05 | Phase 3: Drift + Gate | Pending |
+| RTIX-01 | Phase 4: Index + Route | Pending |
+| RTIX-02 | Phase 4: Index + Route | Pending |
+| RTIX-03 | Phase 4: Index + Route | Pending |
+| INCR-01 | Phase 3: Drift + Gate | Pending |
+| INCR-02 | Phase 3: Drift + Gate | Pending |
+| INCR-03 | Phase 3: Drift + Gate | Pending |
 
 **Coverage:**
-- v1 requirements: 36 total
-- Mapped to phases: 36
+- v1 requirements: 38 total
+- Mapped to phases: 38
 - Unmapped: 0 ✓
 
 ---
