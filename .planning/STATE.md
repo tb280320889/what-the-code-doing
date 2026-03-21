@@ -3,20 +3,20 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-21T10:00:00.000Z"
+last_updated: "2026-03-21T13:45:00.000Z"
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 11
-  completed_plans: 11
+  completed_phases: 4
+  total_plans: 14
+  completed_plans: 14
 ---
 
 # STATE.md — WTCD Project Memory
 
 **Last updated:** 2026-03-21
-**Phase:** 3
+**Phase:** 4
 **Plan:** COMPLETE
-**Status:** Phase 03-drift-gate complete — 6 plans, 22 new tests, 1 new crate (wtcd-diff)
+**Status:** Phase 04-index-route complete — 3 plans, 32 new tests, 160 total
 
 ---
 
@@ -33,6 +33,7 @@ progress:
 Phase: 01 (foundation) — COMPLETE
 Phase: 02 (mirror + fingerprint) — COMPLETE (5 plans, 106 tests)
 Phase: 03 (drift + gate) — COMPLETE (6 plans, 22 new tests, 128 total)
+Phase: 04 (index + route) — COMPLETE (3 plans, 32 new tests, 160 total)
 Phase: 999.1 (MCP Server) — PLANNED (3 plans, 3 waves)
 Plan: Ready for next phase
 
@@ -60,6 +61,9 @@ Plan: Ready for next phase
 | Phase 03-drift-gate 03-04 | ~5min | 1 step | 3 files |
 | Phase 03-drift-gate 03-05 | ~5min | 1 step | 2 files |
 | Phase 03-drift-gate 03-06 | ~15min | 4 steps | 8 files |
+| Phase 04-index-route 04-01 | ~10min | 1 step (TDD) | 2 files |
+| Phase 04-index-route 04-02 | included in 04-01 | — | — |
+| Phase 04-index-route 04-03 | ~5min | 3 steps | 5 files |
 
 ## Accumulated Context
 
@@ -100,6 +104,12 @@ Plan: Ready for next phase
 | Phase 3: Gate config in top-level gate: block | Locked — D-09 |
 | Phase 3: Default fail_on: none (warn-only) | Locked — D-10 |
 | Phase 3: Default incremental run, --full for rebuild | Locked — D-16 |
+| Phase 4: routing_index.json in mirror/ directory | Locked — D-01 |
+| Phase 4: Keyword matching on exports + source_path + module_id | Locked — D-05 |
+| Phase 4: Freshness weights: fresh=1.0, stale=0.7, invalid=0.3, unknown=0.5 | Locked — D-06 |
+| Phase 4: Score = hits/query_tokens × freshness_weight | Locked — D-07 |
+| Phase 4: route reads index from disk | Locked — D-13 |
+| Phase 4: run auto-rebuilds index | Locked — D-14 |
 
 ### Active Todos
 
@@ -120,6 +130,9 @@ Plan: Ready for next phase
 - [x] Phase 03: drift classifier + analyzer (03-04)
 - [x] Phase 03: gate evaluator (03-05)
 - [x] Phase 03: CLI check + incremental run + integration tests (03-06)
+- [x] Phase 04: routing index types + builder (04-01)
+- [x] Phase 04: query engine scoring + ranking (04-02)
+- [x] Phase 04: CLI route command + run auto-rebuild + integration tests (04-03)
 - [x] Phase 999.1 plan: MCP Server phase (3 plans created)
 - [ ] Phase 999.1: Execute wtcd-mcp crate scaffold + tools (Plan 01)
 - [ ] Phase 999.1: Execute CLI integration (Plan 02)
@@ -152,4 +165,4 @@ None currently.
 ---
 
 *Created: 2026-03-21 after roadmap initialization*
-*Last session: 2026-03-21 — Completed Phase 02 (mirror + fingerprint) — 5 plans, 106 tests, 13 files*
+*Last session: 2026-03-21 — Completed Phase 04 (index + route) — 3 plans, 32 new tests, 160 total*
