@@ -8,14 +8,14 @@ progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # STATE.md — WTCD Project Memory
 
 **Last updated:** 2026-03-21
 **Phase:** 1 (Foundation)
-**Plan:** 3 of 5 complete
+**Plan:** 4 of 5 complete
 **Status:** Executing Phase 01
 
 ---
@@ -31,7 +31,7 @@ progress:
 ## Current Position
 
 Phase: 01 (foundation) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 
 ## Performance Metrics
 
@@ -44,6 +44,7 @@ Plan: 3 of 5
 
 ---
 | Phase 01-foundation P03 | 9min | 1 tasks | 1 files |
+| Phase 01-foundation P04 | 15min | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,7 @@ Plan: 3 of 5
 - [x] Phase 1 plan: decompose Foundation into executable plans
 - [x] wtcd-scope: config loading + file scanning (Plan 02)
 - [x] TDD tests for tree-sitter TS/JS parsing (Plan 03)
+- [x] CLI init + run commands (Plan 04)
 - [ ] MSRV unification (clap 4.5 vs 4.6, jsonschema version)
 - [ ] 更新 PROJECT.md/ROADMAP.md/REQUIREMENTS.md 中的项目名 ANRSM → WTCD
 
@@ -99,4 +101,4 @@ None currently.
 ---
 
 *Created: 2026-03-21 after roadmap initialization*
-*Last session: 2026-03-21 — Completed 01-03-PLAN.md (TDD TS/JS adapter tests + bug fixes)*
+*Last session: 2026-03-21 — Completed 01-04-PLAN.md (CLI init/run commands)*

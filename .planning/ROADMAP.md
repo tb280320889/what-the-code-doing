@@ -35,7 +35,7 @@ Plans:
 - [x] 01-01-PLAN.md — Cargo workspace + wtcd-core 核心类型定义
 - [x] 01-02-PLAN.md — wtcd-scope 配置解析 + 文件扫描 ✅
 - [x] 01-03-PLAN.md — wtcd-adapters TS/JS tree-sitter 解析适配器
-- [ ] 01-04-PLAN.md — wtcd-cli init/run 命令 + JSON 输出
+- [x] 01-04-PLAN.md — wtcd-cli init/run 命令 + JSON 输出
 - [ ] 01-05-PLAN.md — Golden test fixtures + 集成测试
 
 ### Phase 2: Mirror + Fingerprint
@@ -81,7 +81,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/5 | In Progress | - |
+| 1. Foundation | 4/5 | In Progress | - |
 | 2. Mirror + Fingerprint | 0/8 | Not started | - |
 | 3. Drift + Gate | 0/12 | Not started | - |
 | 4. Index + Route | 0/5 | Not started | - |
@@ -93,11 +93,11 @@ Plans:
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CORE-01 | Phase 1 | Pending |
-| CORE-02 | Phase 1 | Pending |
-| CORE-03 | Phase 1 | Pending |
+| CORE-02 | Phase 1 | ✅ Complete (01-04) |
+| CORE-03 | Phase 1 | ✅ Complete (01-04) |
 | CORE-04 | Phase 4 | Pending |
 | CORE-05 | Phase 4 | Pending |
-| CORE-06 | Phase 1 | Pending |
+| CORE-06 | Phase 1 | ✅ Complete (01-04) |
 | SCOP-01 | Phase 1 | ✅ Complete (01-02) |
 | SCOP-02 | Phase 1 | ✅ Complete (01-02) |
 | SCOP-03 | Phase 1 | ✅ Complete (01-02) |
