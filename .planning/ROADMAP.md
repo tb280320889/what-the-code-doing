@@ -156,5 +156,20 @@ Plans:
 
 ---
 
+---
+
+## Backlog
+
+### Phase 999.1: 还是要做成MCP, MCP 比 cli 更有优势, 会自动加载到 agent的上下文中,看看如何开发 (BACKLOG)
+
+**Goal:** [Captured for future planning]
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+---
+
 *Roadmap created: 2026-03-21*
 *Ready for: `/gsd-plan-phase 1`
