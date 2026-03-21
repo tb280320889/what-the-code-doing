@@ -18,9 +18,9 @@ Requirements for initial release (M0-M3). Each maps to roadmap phases.
 
 ### Scope Manager
 
-- [ ] **SCOP-01**: 从 `anrsm.yaml` 配置文件读取源码根目录、排除规则和模块映射
-- [ ] **SCOP-02**: 确定性地枚举纳入范围的文件清单
-- [ ] **SCOP-03**: 支持 glob 模式的纳入/排除规则
+- [x] **SCOP-01**: 从 `anrsm.yaml` 配置文件读取源码根目录、排除规则和模块映射
+- [x] **SCOP-02**: 确定性地枚举纳入范围的文件清单
+- [x] **SCOP-03**: 支持 glob 模式的纳入/排除规则
 
 ### Language Adapter (TypeScript/JS)
 
@@ -122,9 +122,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | CORE-04 | Phase 4: Index + Route | Pending |
 | CORE-05 | Phase 4: Index + Route | Pending |
 | CORE-06 | Phase 1: Foundation | Pending |
-| SCOP-01 | Phase 1: Foundation | Pending |
-| SCOP-02 | Phase 1: Foundation | Pending |
-| SCOP-03 | Phase 1: Foundation | Pending |
+| SCOP-01 | Phase 1: Foundation | ✅ Complete (01-02) |
+| SCOP-02 | Phase 1: Foundation | ✅ Complete (01-02) |
+| SCOP-03 | Phase 1: Foundation | ✅ Complete (01-02) |
 | LANG-01 | Phase 1: Foundation | Pending |
 | LANG-02 | Phase 1: Foundation | Pending |
 | LANG-03 | Phase 1: Foundation | Pending |

@@ -33,7 +33,7 @@
 
 Plans:
 - [ ] 01-01-PLAN.md — Cargo workspace + wtcd-core 核心类型定义
-- [ ] 01-02-PLAN.md — wtcd-scope 配置解析 + 文件扫描
+- [x] 01-02-PLAN.md — wtcd-scope 配置解析 + 文件扫描 ✅
 - [ ] 01-03-PLAN.md — wtcd-adapters TS/JS tree-sitter 解析适配器
 - [ ] 01-04-PLAN.md — wtcd-cli init/run 命令 + JSON 输出
 - [ ] 01-05-PLAN.md — Golden test fixtures + 集成测试
@@ -81,7 +81,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/5 | Planned | - |
+| 1. Foundation | 1/5 | In Progress | - |
 | 2. Mirror + Fingerprint | 0/8 | Not started | - |
 | 3. Drift + Gate | 0/12 | Not started | - |
 | 4. Index + Route | 0/5 | Not started | - |
@@ -98,9 +98,9 @@ Plans:
 | CORE-04 | Phase 4 | Pending |
 | CORE-05 | Phase 4 | Pending |
 | CORE-06 | Phase 1 | Pending |
-| SCOP-01 | Phase 1 | Pending |
-| SCOP-02 | Phase 1 | Pending |
-| SCOP-03 | Phase 1 | Pending |
+| SCOP-01 | Phase 1 | ✅ Complete (01-02) |
+| SCOP-02 | Phase 1 | ✅ Complete (01-02) |
+| SCOP-03 | Phase 1 | ✅ Complete (01-02) |
 | LANG-01 | Phase 1 | Pending |
 | LANG-02 | Phase 1 | Pending |
 | LANG-03 | Phase 1 | Pending |
