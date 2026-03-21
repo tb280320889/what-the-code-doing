@@ -11,6 +11,8 @@ pub struct Config {
     pub mirror: Option<MirrorConfig>,
     #[serde(default)]
     pub output: Option<OutputConfig>,
+    #[serde(default)]
+    pub gate: Option<GateConfig>,
 }
 
 fn default_repo_root() -> String {
@@ -53,6 +55,40 @@ pub struct OutputConfig {
 
 fn default_output_format() -> String {
     "json".to_string()
+}
+
+/// Gate configuration block (D-09: top-level gate: block in anrsm.yaml)
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct GateConfig {
+    /// Fail_on rules: which change classes trigger exit code 1 (D-10: default none)
+    #[serde(default)]
+    pub fail_on: Vec<FailRule>,
+    /// Warn_on rules: which change classes produce warnings but don't fail
+    #[serde(default)]
+    pub warn_on: Vec<WarnRule>,
+    /// C3 threshold: minimum importer count for systemic classification (D-08)
+    #[serde(default = "default_systemic_threshold")]
+    pub systemic_threshold: usize,
+}
+
+fn default_systemic_threshold() -> usize {
+    5
+}
+
+/// A fail rule specifies which change classes block (D-11)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FailRule {
+    /// Change class to match: "C1", "C2", "C3", or "any"
+    pub when: String,
+    /// Failure code: ANRSM-001 through ANRSM-010
+    pub code: String,
+}
+
+/// A warn rule specifies which change classes produce warnings
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WarnRule {
+    /// Change class to match: "C0", "C1", "C2", "C3", or "any"
+    pub when: String,
 }
 
 impl Config {

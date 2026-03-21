@@ -118,3 +118,78 @@ pub struct RunOutput {
     pub errors: Vec<String>,
     pub summary: RunSummary,
 }
+
+// ─── Drift Detection Types (Phase 3) ──────────────────────────────────────
+
+/// Material change classification (DRFT-02)
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum ChangeClass {
+    /// Source changed, semantic unchanged (formatting/comments)
+    C0,
+    /// Semantic changed, exports/signatures unchanged (internal logic)
+    C1,
+    /// Exports or signatures changed (contract change)
+    C2,
+    /// Systemic: imported by >= N files (configurable threshold)
+    C3,
+}
+
+impl std::fmt::Display for ChangeClass {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ChangeClass::C0 => write!(f, "C0"),
+            ChangeClass::C1 => write!(f, "C1"),
+            ChangeClass::C2 => write!(f, "C2"),
+            ChangeClass::C3 => write!(f, "C3"),
+        }
+    }
+}
+
+/// A single material change entry in the drift report (maps to drift-report.schema.json material_changes[])
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MaterialChange {
+    pub change_class: ChangeClass,
+    pub source_path: String,
+    pub summary: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub evidence: Option<Vec<String>>,
+}
+
+/// Freshness state for an affected artifact (maps to drift-report.schema.json affected_artifacts[])
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AffectedArtifact {
+    pub artifact_id: String,
+    pub before_freshness: String,
+    pub after_freshness: String,
+    pub drift_level: String,
+    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recommended_action: Option<String>,
+}
+
+/// Policy evaluation result (maps to drift-report.schema.json policy_result)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PolicyResult {
+    pub status: String, // "pass", "warn", "fail"
+    pub failed_rules: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub failure_codes: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recommendations: Option<Vec<String>>,
+}
+
+/// Complete drift report (maps to drift-report.schema.json)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DriftReport {
+    pub report_version: u32, // always 1
+    pub report_id: String,
+    pub repo_commit_before: String,
+    pub repo_commit_after: String,
+    pub generated_at: String,
+    pub drift_level: String, // "none", "low", "material", "blocking"
+    pub changed_files: Vec<String>,
+    pub affected_artifacts: Vec<AffectedArtifact>,
+    pub material_changes: Vec<MaterialChange>,
+    pub policy_result: PolicyResult,
+}

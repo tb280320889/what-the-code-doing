@@ -10,3 +10,4 @@ serde_json = { workspace = true }
 yaml_serde = { workspace = true }
 thiserror = { workspace = true }
 chrono = { workspace = true }
+uuid = { workspace = true }
