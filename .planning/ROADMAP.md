@@ -48,7 +48,14 @@ Plans:
   3. Mirror path follows deterministic mapping: `mirror/file/<source_relative_path>.md`
   4. `source_fingerprint` changes on any text edit; `semantic_fingerprint` stays stable across whitespace/comment/formatting changes
   5. Fingerprint algorithm includes `fp_version` field for future algorithm upgrades
-**Plans**: TBD
+**Plans**: 5 plans in 4 waves
+
+Plans:
+- [ ] 02-01-PLAN.md — wtcd-mirror crate scaffold + core types + MirrorConfig (Wave 1)
+- [ ] 02-02-PLAN.md — Fingerprint engine: source + semantic dual fingerprints (Wave 2)
+- [ ] 02-03-PLAN.md — Mirror template engine: 8 sections + YAML frontmatter (Wave 2)
+- [ ] 02-04-PLAN.md — Mirror file I/O + manual_appendix preservation (Wave 3)
+- [ ] 02-05-PLAN.md — Pipeline integration: anrsm run → mirror generation (Wave 4)
 
 ### Phase 3: Drift + Gate
 **Goal**: Users and CI can detect when source changes require mirror updates, with configurable gate policies that block or warn based on drift severity
@@ -82,7 +89,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/5 | In Progress | - |
-| 2. Mirror + Fingerprint | 0/8 | Not started | - |
+| 2. Mirror + Fingerprint | 0/5 | Not started | - |
 | 3. Drift + Gate | 0/12 | Not started | - |
 | 4. Index + Route | 0/5 | Not started | - |
 
