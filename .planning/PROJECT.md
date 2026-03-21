@@ -14,7 +14,7 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] TypeScript/JS 适配器：首批目标语言，AST 级结构化提取 — `Validated in Phase 01: Foundation`
 
 ### Active
 
@@ -23,9 +23,8 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 - [ ] 语义指纹与漂移检测：区分 C0/C1/C2/C3，输出漂移报告
 - [ ] CI 门禁：pre-commit / PR 级阻断未同步的 Material Change
 - [ ] 路由索引：从任务描述映射到候选模块和文件集合
-- [ ] Agent 集成：CLI 驱动的读取顺序引导，JSON 结构化输出
-- [ ] TypeScript/JS 适配器：首批目标语言，AST 级结构化提取
-- [ ] Rust CLI 分发：crates.io + GitHub Releases 预编译二进制
+  - [ ] Agent 集成：CLI 驱动的读取顺序引导，JSON 结构化输出
+  - [ ] Rust CLI 分发：crates.io + GitHub Releases 预编译二进制
 
 ### Out of Scope (v1)
 
@@ -86,6 +85,8 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 
 This document evolves at phase transitions and milestone boundaries.
 
+**Current State**: Phase 01 (Foundation) complete — core types, scope manager, TS/JS tree-sitter adapter, CLI init/run, 54 tests passing.
+
 **After each phase transition** (via `/gsd-transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
 2. Requirements validated? → Move to Validated with phase reference
@@ -100,4 +101,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-21 after initialization*
+*Last updated: 2026-03-21 after Phase 01 completion*
