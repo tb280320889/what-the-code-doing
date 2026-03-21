@@ -5,6 +5,7 @@ members = [
     "crates/wtcd-adapters",
     "crates/wtcd-cli",
     "crates/wtcd-tests",
+    "crates/wtcd-mirror",
 ]
 resolver = "2"
 
@@ -17,6 +18,7 @@ license = "MIT"
 wtcd-core = { path = "crates/wtcd-core" }
 wtcd-scope = { path = "crates/wtcd-scope" }
 wtcd-adapters = { path = "crates/wtcd-adapters" }
+wtcd-mirror = { path = "crates/wtcd-mirror" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 yaml_serde = "0.10"

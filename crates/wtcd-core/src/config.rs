@@ -25,9 +25,24 @@ pub struct ScopeConfig {
     pub exclude_patterns: Vec<String>,
 }
 
-/// Mirror configuration block (Phase 1 reserved, empty) (D-08)
+/// Mirror configuration block (D-08, D-15)
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct MirrorConfig {}
+pub struct MirrorConfig {
+    #[serde(default = "default_mirror_output_dir")]
+    pub output_dir: String,
+    #[serde(default = "default_fp_version")]
+    pub fp_version: String,
+    #[serde(default)]
+    pub include_manual_appendix: bool,
+}
+
+fn default_mirror_output_dir() -> String {
+    "mirror/file".to_string()
+}
+
+fn default_fp_version() -> String {
+    "1".to_string()
+}
 
 /// Output configuration block
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -43,13 +58,11 @@ fn default_output_format() -> String {
 impl Config {
     /// Load config from YAML string
     pub fn from_yaml(yaml: &str) -> crate::error::Result<Self> {
-        yaml_serde::from_str(yaml)
-            .map_err(|e| crate::error::WtcdError::YamlError(e.to_string()))
+        yaml_serde::from_str(yaml).map_err(|e| crate::error::WtcdError::YamlError(e.to_string()))
     }
 
     /// Serialize config to YAML string
     pub fn to_yaml(&self) -> crate::error::Result<String> {
-        yaml_serde::to_string(self)
-            .map_err(|e| crate::error::WtcdError::YamlError(e.to_string()))
+        yaml_serde::to_string(self).map_err(|e| crate::error::WtcdError::YamlError(e.to_string()))
     }
 }
