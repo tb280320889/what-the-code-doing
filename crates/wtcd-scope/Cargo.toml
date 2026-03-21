@@ -1,0 +1,13 @@
+[package]
+name = "wtcd-scope"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+wtcd-core = { workspace = true }
+ignore = { workspace = true }
+globset = { workspace = true }
+anyhow = { workspace = true }
+serde = { workspace = true }
+yaml_serde = { workspace = true }
