@@ -9,12 +9,12 @@ Requirements for initial release (M0-M3). Each maps to roadmap phases.
 
 ### Core Engine
 
-- [ ] **CORE-01**: CLI 可通过 `cargo install anrsm` 或 GitHub Releases 安装为单二进制
+- [x] **CORE-01**: CLI 可通过 `cargo install anrsm` 或 GitHub Releases 安装为单二进制
 - [ ] **CORE-02**: CLI 支持 `anrsm init` 命令，在目标仓库初始化 ANRSM 配置和目录结构
 - [ ] **CORE-03**: CLI 支持 `anrsm run` 命令，对目标仓库执行全量扫描和镜像生成
 - [ ] **CORE-04**: CLI 支持 `anrsm check` 命令，检测当前变更集的镜像漂移
 - [ ] **CORE-05**: CLI 支持 `anrsm route <task>` 命令，将任务路由到候选模块和文件
-- [ ] **CORE-06**: CLI 输出 JSON 格式，可被 Agent 直接解析
+- [x] **CORE-06**: CLI 输出 JSON 格式，可被 Agent 直接解析
 
 ### Scope Manager
 
@@ -116,12 +116,12 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1: Foundation | Pending |
+| CORE-01 | Phase 1: Foundation | Complete |
 | CORE-02 | Phase 1: Foundation | Pending |
 | CORE-03 | Phase 1: Foundation | Pending |
 | CORE-04 | Phase 4: Index + Route | Pending |
 | CORE-05 | Phase 4: Index + Route | Pending |
-| CORE-06 | Phase 1: Foundation | Pending |
+| CORE-06 | Phase 1: Foundation | Complete |
 | SCOP-01 | Phase 1: Foundation | ✅ Complete (01-02) |
 | SCOP-02 | Phase 1: Foundation | ✅ Complete (01-02) |
 | SCOP-03 | Phase 1: Foundation | ✅ Complete (01-02) |

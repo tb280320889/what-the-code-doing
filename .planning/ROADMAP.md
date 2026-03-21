@@ -36,7 +36,7 @@ Plans:
 - [x] 01-02-PLAN.md — wtcd-scope 配置解析 + 文件扫描 ✅
 - [x] 01-03-PLAN.md — wtcd-adapters TS/JS tree-sitter 解析适配器
 - [x] 01-04-PLAN.md — wtcd-cli init/run 命令 + JSON 输出
-- [ ] 01-05-PLAN.md — Golden test fixtures + 集成测试
+- [x] 01-05-PLAN.md — Golden test fixtures + 集成测试
 
 ### Phase 2: Mirror + Fingerprint
 **Goal**: Parsed semantic facts are rendered as version-controllable mirror files with dual fingerprints distinguishing content changes from semantic changes

@@ -3,20 +3,20 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-21T03:30:23.954Z"
+last_updated: "2026-03-21T07:32:39.183Z"
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # STATE.md — WTCD Project Memory
 
 **Last updated:** 2026-03-21
 **Phase:** 1 (Foundation)
-**Plan:** 4 of 5 complete
-**Status:** Executing Phase 01
+**Plan:** 5 of 5 complete
+**Status:** Ready to execute
 
 ---
 
@@ -30,8 +30,8 @@ progress:
 
 ## Current Position
 
-Phase: 01 (foundation) — EXECUTING
-Plan: 4 of 5
+Phase: 01 (foundation) — COMPLETE
+Plan: 5 of 5 complete
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Plan: 4 of 5
 ---
 | Phase 01-foundation P03 | 9min | 1 tasks | 1 files |
 | Phase 01-foundation P04 | 15min | 2 tasks | 16 files |
+| Phase 01-foundation P05 | 6min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,8 @@ Plan: 4 of 5
 | Warn-only gate initially | Required — C2 pitfall prevention |
 | Incremental as default path | Required — C6 pitfall prevention |
 | tree-sitter positional children traversal for unnamed nodes | Locked — children().find(c.kind()) for import_clause, formal_parameters, variable identifiers |
+| Phase 1 五 crate workspace (含 wtcd-tests) | Locked — wtcd-core, wtcd-scope, wtcd-adapters, wtcd-cli, wtcd-tests |
+| Integration tests 在 dedicated crate | Locked — Cargo virtual manifest 不支持 dev-dependencies |
 
 ### Active Todos
 
@@ -73,6 +76,7 @@ Plan: 4 of 5
 - [x] wtcd-scope: config loading + file scanning (Plan 02)
 - [x] TDD tests for tree-sitter TS/JS parsing (Plan 03)
 - [x] CLI init + run commands (Plan 04)
+- [x] Golden fixtures + integration tests (Plan 05)
 - [ ] MSRV unification (clap 4.5 vs 4.6, jsonschema version)
 - [ ] 更新 PROJECT.md/ROADMAP.md/REQUIREMENTS.md 中的项目名 ANRSM → WTCD
 
@@ -101,4 +105,4 @@ None currently.
 ---
 
 *Created: 2026-03-21 after roadmap initialization*
-*Last session: 2026-03-21 — Completed 01-04-PLAN.md (CLI init/run commands)*
+*Last session: 2026-03-21 — Completed 01-05-PLAN.md (Golden fixtures + integration tests) — Phase 01 COMPLETE*
