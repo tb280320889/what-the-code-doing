@@ -24,14 +24,15 @@ progress:
 
 **Core Value:** 让 AI Agent 的默认读取行为从"吞源码"变为"先读镜像"，用最小充分上下文完成工程决策。
 
-**Current Focus:** Phase 01 — foundation
+**Current Focus:** Phase 999.1 — MCP Server
 
 ---
 
 ## Current Position
 
 Phase: 01 (foundation) — COMPLETE
-Plan: 5 of 5 complete
+Phase: 999.1 (MCP Server) — PLANNED (3 plans, 3 waves)
+Plan: Ready to execute
 
 ## Performance Metrics
 
@@ -77,6 +78,10 @@ Plan: 5 of 5 complete
 - [x] TDD tests for tree-sitter TS/JS parsing (Plan 03)
 - [x] CLI init + run commands (Plan 04)
 - [x] Golden fixtures + integration tests (Plan 05)
+- [x] Phase 999.1 plan: MCP Server phase (3 plans created)
+- [ ] Phase 999.1: Execute wtcd-mcp crate scaffold + tools (Plan 01)
+- [ ] Phase 999.1: Execute CLI integration (Plan 02)
+- [ ] Phase 999.1: Execute verification + docs (Plan 03)
 - [ ] MSRV unification (clap 4.5 vs 4.6, jsonschema version)
 - [ ] 更新 PROJECT.md/ROADMAP.md/REQUIREMENTS.md 中的项目名 ANRSM → WTCD
 
@@ -105,4 +110,4 @@ None currently.
 ---
 
 *Created: 2026-03-21 after roadmap initialization*
-*Last session: 2026-03-21 — Completed 01-05-PLAN.md (Golden fixtures + integration tests) — Phase 01 COMPLETE*
+*Last session: 2026-03-21 — Planned Phase 999.1 (MCP Server) — 3 plans in 3 waves*
