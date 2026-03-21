@@ -35,15 +35,25 @@ enum Commands {
         #[arg(long, default_value = "10")]
         top_k: usize,
     },
+    /// Start MCP Server (stdio mode)
+    Mcp {},
+    /// Print MCP config for an agent [claude|cursor]
+    McpInstall {
+        /// Agent name (claude or cursor)
+        agent: String,
+    },
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let cli = Cli::parse();
-    let result = match cli.command {
-        Commands::Init {} => commands::init::run_init(&cli.root),
-        Commands::Run { full } => commands::run::run_analysis(&cli.root, full),
-        Commands::Check {} => commands::check::run_check(&cli.root),
-        Commands::Route { query, top_k } => commands::route::run_route(&cli.root, &query, top_k),
+    let result: anyhow::Result<()> = match cli.command {
+        Commands::Init {} => commands::init::run_init(&cli.root).map_err(|e| anyhow::anyhow!(e)),
+        Commands::Run { full } => commands::run::run_analysis(&cli.root, full).map_err(|e| anyhow::anyhow!(e)),
+        Commands::Check {} => commands::check::run_check(&cli.root).map_err(|e| anyhow::anyhow!(e)),
+        Commands::Route { query, top_k } => commands::route::run_route(&cli.root, &query, top_k).map_err(|e| anyhow::anyhow!(e)),
+        Commands::Mcp {} => commands::mcp::run_mcp(&cli.root).await,
+        Commands::McpInstall { agent } => commands::mcp_install::install_for_agent(&agent),
     };
 
     if let Err(e) = result {

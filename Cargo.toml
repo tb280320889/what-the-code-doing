@@ -20,6 +20,7 @@ license = "MIT"
 wtcd-core = { path = "crates/wtcd-core" }
 wtcd-scope = { path = "crates/wtcd-scope" }
 wtcd-adapters = { path = "crates/wtcd-adapters" }
+wtcd-mcp = { path = "crates/wtcd-mcp" }
 wtcd-mirror = { path = "crates/wtcd-mirror" }
 wtcd-diff = { path = "crates/wtcd-diff" }
 serde = { version = "1", features = ["derive"] }
