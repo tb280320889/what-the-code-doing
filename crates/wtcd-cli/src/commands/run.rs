@@ -1,5 +1,5 @@
 use crate::output::format_json;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 use std::time::Instant;
 use wtcd_adapters::register_all_adapters;
@@ -171,6 +171,36 @@ pub fn run_analysis(repo_root: &Path, full: bool) -> wtcd_core::error::Result<()
         .collect();
     if let Ok(orphans) = wtcd_mirror::io::find_orphan_mirrors(&source_paths, &mirror_root) {
         let _ = wtcd_mirror::io::delete_orphans(&orphans);
+    }
+
+    // 7b. Build and write routing index (D-14, RTIX-01)
+    let module_id_map: HashMap<String, String> = files_to_parse
+        .iter()
+        .map(|f| {
+            let relative = f
+                .strip_prefix(repo_root)
+                .unwrap_or(f)
+                .to_string_lossy()
+                .to_string();
+            let module_id = derive_module_id(&relative, &config.scope.source_roots);
+            (relative, module_id)
+        })
+        .collect();
+
+    let routing_index = wtcd_core::index::build_routing_index(&file_results, &module_id_map);
+    let index_path = mirror_root
+        .parent()
+        .unwrap_or_else(|| std::path::Path::new("mirror"))
+        .join("routing_index.json");
+
+    if let Err(e) = wtcd_core::index::write_routing_index(&routing_index, &index_path) {
+        eprintln!("Warning: failed to write routing index: {}", e);
+    } else {
+        eprintln!(
+            "Routing index: {} entries → {}",
+            routing_index.entries.len(),
+            index_path.display()
+        );
     }
 
     // 8. Build summary (D-07)
