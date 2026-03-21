@@ -3,20 +3,20 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-21T08:30:00.000Z"
+last_updated: "2026-03-21T10:00:00.000Z"
 progress:
   total_phases: 4
-  completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  completed_phases: 3
+  total_plans: 11
+  completed_plans: 11
 ---
 
 # STATE.md — WTCD Project Memory
 
 **Last updated:** 2026-03-21
-**Phase:** 2
+**Phase:** 3
 **Plan:** COMPLETE
-**Status:** Phase 02-mirror-fingerprint complete — 5 plans executed
+**Status:** Phase 03-drift-gate complete — 6 plans, 22 new tests, 1 new crate (wtcd-diff)
 
 ---
 
@@ -32,6 +32,7 @@ progress:
 
 Phase: 01 (foundation) — COMPLETE
 Phase: 02 (mirror + fingerprint) — COMPLETE (5 plans, 106 tests)
+Phase: 03 (drift + gate) — COMPLETE (6 plans, 22 new tests, 128 total)
 Phase: 999.1 (MCP Server) — PLANNED (3 plans, 3 waves)
 Plan: Ready for next phase
 
@@ -53,6 +54,12 @@ Plan: Ready for next phase
 | Phase 02-mirror-fingerprint 02-03 | ~10min | 4 steps | 1 file |
 | Phase 02-mirror-fingerprint 02-04 | ~10min | 4 steps | 1 file |
 | Phase 02-mirror-fingerprint 02-05 | ~10min | 3 steps | 6 files |
+| Phase 03-drift-gate 03-01 | ~5min | 3 steps | 3 files |
+| Phase 03-drift-gate 03-02 | ~10min | 3 steps | 4 files |
+| Phase 03-drift-gate 03-03 | ~5min | 1 step | 2 files |
+| Phase 03-drift-gate 03-04 | ~5min | 1 step | 3 files |
+| Phase 03-drift-gate 03-05 | ~5min | 1 step | 2 files |
+| Phase 03-drift-gate 03-06 | ~15min | 4 steps | 8 files |
 
 ## Accumulated Context
 
@@ -86,6 +93,13 @@ Plan: Ready for next phase
 | Phase 2: Single wtcd-mirror crate | Locked — D-13 |
 | Phase 2: Mirror generation in anrsm run | Locked — D-15 |
 | Phase 2: wtcd-mirror doesn't depend on wtcd-scope | Locked — D-16 |
+| Phase 3: gix 0.63 for pure Rust git diff | Locked — D-01 (0.80 requires Rust 1.88) |
+| Phase 3: C0 = source changed, semantic unchanged | Locked — D-05 |
+| Phase 3: C1 = semantic changed, exports unchanged; C2 = exports changed | Locked — D-06 |
+| Phase 3: C3 = imported by ≥5 files (configurable) | Locked — D-07 |
+| Phase 3: Gate config in top-level gate: block | Locked — D-09 |
+| Phase 3: Default fail_on: none (warn-only) | Locked — D-10 |
+| Phase 3: Default incremental run, --full for rebuild | Locked — D-16 |
 
 ### Active Todos
 
@@ -100,6 +114,12 @@ Plan: Ready for next phase
 - [x] Phase 02: mirror template engine (02-03)
 - [x] Phase 02: mirror file I/O + orphan cleanup (02-04)
 - [x] Phase 02: CLI integration + E2E tests (02-05)
+- [x] Phase 03: scaffold wtcd-diff crate (03-01)
+- [x] Phase 03: gix git diff (03-02)
+- [x] Phase 03: ReverseDepGraph (03-03)
+- [x] Phase 03: drift classifier + analyzer (03-04)
+- [x] Phase 03: gate evaluator (03-05)
+- [x] Phase 03: CLI check + incremental run + integration tests (03-06)
 - [x] Phase 999.1 plan: MCP Server phase (3 plans created)
 - [ ] Phase 999.1: Execute wtcd-mcp crate scaffold + tools (Plan 01)
 - [ ] Phase 999.1: Execute CLI integration (Plan 02)
