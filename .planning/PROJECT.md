@@ -15,16 +15,20 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 ### Validated
 
 - [x] TypeScript/JS 适配器：首批目标语言，AST 级结构化提取 — `Validated in Phase 01: Foundation`
+- [x] 规范冻结：术语、路径映射、文档头 Schema、Material Change 分类已锁定 — `Validated in Phase 01`
+- [x] 文件级语义镜像生成：Scope Manager + Language Adapter + Mirror Generator 输出标准镜像 — `Validated in Phase 02`
+- [x] 语义指纹与漂移检测：区分 C0/C1/C2/C3，输出漂移报告 — `Validated in Phase 03`
+- [x] CI 门禁：pre-commit / PR 级阻断未同步的 Material Change — `Validated in Phase 03`
+- [x] 路由索引：从任务描述映射到候选模块和文件集合 — `Validated in Phase 04`
+- [x] Agent 集成：CLI 驱动的读取顺序引导，JSON 结构化输出 — `Validated in Phase 01+04`
+- [x] Rust CLI 分发：crates.io + GitHub Releases 预编译二进制 — `Validated in Phase 01`
+- [x] MCP Server 集成：通过 MCP 协议暴露 WTCD 核心能力给 Agent — `Validated in Phase 999.1`
 
-### Active
+### Active (v2)
 
-- [ ] 规范冻结：术语、路径映射、文档头 Schema、Material Change 分类已锁定
-- [ ] 文件级语义镜像生成：Scope Manager + Language Adapter + Mirror Generator 输出标准镜像
-- [ ] 语义指纹与漂移检测：区分 C0/C1/C2/C3，输出漂移报告
-- [ ] CI 门禁：pre-commit / PR 级阻断未同步的 Material Change
-- [ ] 路由索引：从任务描述映射到候选模块和文件集合
-  - [ ] Agent 集成：CLI 驱动的读取顺序引导，JSON 结构化输出
-  - [ ] Rust CLI 分发：crates.io + GitHub Releases 预编译二进制
+- [ ] 多语言适配器（Python, Go）
+- [ ] 模块级镜像聚合
+- [ ] 知识层文档生成
 
 ### Out of Scope (v1)
 
@@ -64,7 +68,7 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 
 - **技术栈**：Rust 核心引擎，不接受其他语言重写核心
 - **语言适配**：从一开始支持多语言适配器架构，首批 TS/JS
-- **Agent 集成**：CLI 驱动模式，JSON 结构化输出，不走 MCP Server
+- **Agent 集成**：CLI 驱动模式 + MCP Server 双轨制，JSON 结构化输出
 - **分发**：必须支持 crates.io 和 GitHub Releases 两种渠道
 - **规范先行**：实现必须符合已冻结的 11 份核心规范，规范变更需走 ADR
 - **试点**：本仓库自身作为第一个 dogfood 试点
@@ -73,26 +77,20 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Rust 作为核心引擎 | 性能好，编译为单二进制，CI 集成简单，生态成熟 | — Pending |
-| CLI 驱动 Agent 集成 | 比 MCP Server 更简洁通用，任何 Agent 都能调用 CLI | — Pending |
-| JSON 作为 CLI 输出格式 | Agent 可直接解析，人类可用 jq 处理 | — Pending |
-| TypeScript/JS 作为首批适配器 | 前端/全栈项目量大，AST 工具链成熟（SWC/Tree-sitter） | — Pending |
-| Markdown + YAML Front Matter 作为镜像格式 | 文本化、可 diff、可版本管理、人类可读、机器可解析 | — Pending |
-| 本仓库自身作为试点 | Dogfooding 验证可行性，发现规范盲点 | — Pending |
-| 多语言适配器从一开始设计 | 避免后期架构返工，适配器插件化 | — Pending |
+| Rust 作为核心引擎 | 性能好，编译为单二进制，CI 集成简单，生态成熟 | ✅ 8 crates, 160 tests |
+| CLI 驱动 Agent 集成 | 比 MCP Server 更简洁通用，任何 Agent 都能调用 CLI | ✅ init/run/check/route 命令 |
+| JSON 作为 CLI 输出格式 | Agent 可直接解析，人类可用 jq 处理 | ✅ 所有命令 JSON 输出 |
+| TypeScript/JS 作为首批适配器 | 前端/全栈项目量大，AST 工具链成熟（tree-sitter） | ✅ TS/JS tree-sitter 适配器 |
+| Markdown + YAML Front Matter 作为镜像格式 | 文本化、可 diff、可版本管理、人类可读、机器可解析 | ✅ wtcd-mirror crate |
+| 本仓库自身作为试点 | Dogfooding 验证可行性，发现规范盲点 | ✅ Phase 1 试点完成 |
+| 多语言适配器从一开始设计 | 避免后期架构返工，适配器插件化 | ✅ trait-based adapter registry |
+| MCP Server 集成 | Agent 自动发现 WTCD 能力，无需手动调用 CLI | ✅ rmcp 1.2.0, 4 MCP Tools |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
-**Current State**: Phase 01 (Foundation) complete — core types, scope manager, TS/JS tree-sitter adapter, CLI init/run, 54 tests passing.
-
-**After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
+**Current State**: Milestone v1.0 complete — 5 phases, 8 crates, 160 tests, 38/38 requirements satisfied. v1 交付了完整的解析→镜像→漂移检测→路由索引→MCP Server 管线。
 
 **After each milestone** (via `/gsd-complete-milestone`):
 1. Full review of all sections
@@ -101,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-21 after Phase 01 completion*
+*Last updated: 2026-03-21 after v1.0 milestone completion*
