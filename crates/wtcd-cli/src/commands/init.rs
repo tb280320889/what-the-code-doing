@@ -21,7 +21,10 @@ scope:
     - "**/*.d.ts"
     - "**/*.min.js"
 
-mirror: {}
+mirror:
+  output_dir: mirror/file
+  fp_version: "1"
+  include_manual_appendix: true
 
 output:
   format: json

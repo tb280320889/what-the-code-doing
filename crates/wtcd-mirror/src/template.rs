@@ -1,5 +1,3 @@
-use std::time::SystemTime;
-
 use anyhow::Result;
 use chrono::Utc;
 
@@ -47,28 +45,6 @@ fn derive_language(file_path: &str) -> String {
         _ => "unknown",
     }
     .to_string()
-}
-
-fn derive_module_id(file_path: &str, source_roots: &[String]) -> String {
-    let path = std::path::Path::new(file_path);
-    let components: Vec<_> = path
-        .components()
-        .map(|c| c.as_os_str().to_string_lossy().to_string())
-        .collect();
-
-    if components.is_empty() {
-        return "global".to_string();
-    }
-
-    // If first component matches a source root, use second component
-    if source_roots.iter().any(|r| r == &components[0]) {
-        if components.len() > 1 {
-            return components[1].clone();
-        }
-    }
-
-    // Fallback: use first component
-    components[0].clone()
 }
 
 fn derive_risk_tags(side_effects: &[SideEffect]) -> Vec<String> {
