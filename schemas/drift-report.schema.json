@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/anrsm/schemas/drift-report.schema.json",
+  "title": "ANRSM Drift Report",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "report_version",
+    "report_id",
+    "repo_commit_before",
+    "repo_commit_after",
+    "generated_at",
+    "drift_level",
+    "changed_files",
+    "affected_artifacts",
+    "material_changes",
+    "policy_result"
+  ],
+  "properties": {
+    "report_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "report_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repo_commit_before": {
+      "type": "string",
+      "minLength": 7
+    },
+    "repo_commit_after": {
+      "type": "string",
+      "minLength": 7
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "drift_level": {
+      "type": "string",
+      "enum": [
+        "none",
+        "low",
+        "material",
+        "blocking"
+      ]
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "affected_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "artifact_id",
+          "before_freshness",
+          "after_freshness",
+          "drift_level",
+          "reason"
+        ],
+        "properties": {
+          "artifact_id": {
+            "type": "string"
+          },
+          "before_freshness": {
+            "type": "string",
+            "enum": [
+              "fresh",
+              "stale",
+              "invalid",
+              "unknown"
+            ]
+          },
+          "after_freshness": {
+            "type": "string",
+            "enum": [
+              "fresh",
+              "stale",
+              "invalid",
+              "unknown"
+            ]
+          },
+          "drift_level": {
+            "type": "string",
+            "enum": [
+              "none",
+              "low",
+              "material",
+              "blocking"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "recommended_action": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "material_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "change_class",
+          "source_path",
+          "summary"
+        ],
+        "properties": {
+          "change_class": {
+            "type": "string",
+            "enum": [
+              "C0",
+              "C1",
+              "C2",
+              "C3"
+            ]
+          },
+          "source_path": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "policy_result": {
+      "type": "object",
+      "required": [
+        "status",
+        "failed_rules"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "warn",
+            "fail"
+          ]
+        },
+        "failed_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "failure_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
