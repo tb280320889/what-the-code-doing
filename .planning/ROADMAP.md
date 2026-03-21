@@ -1,102 +1,124 @@
 # Roadmap: WTCD — What The Code Doing
 
+**Milestone:** v0.1.1 — Multi-Language & Knowledge Layer
 **Created:** 2026-03-21
-**Completed:** 2026-03-21
 **Granularity:** Coarse
-**Total v1 Requirements:** 38
-**Phases:** 5 (4 main + 1 backlog)
-**Status:** ✅ ALL PHASES COMPLETE
+**Total v0.1.1 Requirements:** 40
+**Phases:** 4 (Phase 5–8)
+**Status:** 🚧 IN PROGRESS
+
+---
+
+## Milestones
+
+- ✅ **v1.0 MVP** — Phases 1–4 + 999.1 (shipped 2026-03-21, 38/38 requirements)
+- 🚧 **v0.1.1 Multi-Language & Knowledge** — Phases 5–8 (in progress)
 
 ---
 
 ## Phases
 
-- [x] **Phase 1: Foundation** — 核心类型、CLI 框架、TS/JS 解析、配置与范围管理
-- [x] **Phase 2: Mirror + Fingerprint** — 文件镜像生成、语义指纹计算
-- [x] **Phase 3: Drift + Gate** — 漂移检测、CI 门禁、增量更新
-- [x] **Phase 4: Index + Route** — 路由索引构建、Agent 查询接口
-- [x] **Phase 999.1: MCP Server** — MCP 协议暴露 WTCD 核心能力给 Agent
+- [ ] **Phase 5: Python Adapter** — Python tree-sitter 解析适配器，提取函数/类/import/装饰器/类型注解
+- [ ] **Phase 6: Go Adapter** — Go tree-sitter 解析适配器，提取函数/方法/struct/interface/import/可见性
+- [ ] **Phase 7: Module Aggregation** — 模块级镜像聚合：导出汇总、依赖图、指纹、漂移检测
+- [ ] **Phase 8: Knowledge Layer** — 知识层文档生成：仓库总览、模块关系图、导出索引、统计
+
+---
+
+<details>
+<summary>✅ v1.0 MVP (Phases 1–4 + 999.1) — SHIPPED 2026-03-21</summary>
+
+### Phase 1: Foundation ✅
+**Goal**: Core types, CLI framework, TS/JS parsing, config & scope management
+**Plans**: 5 plans — Complete
+
+### Phase 2: Mirror + Fingerprint ✅
+**Goal**: File mirror generation, semantic fingerprint calculation
+**Plans**: 5 plans — Complete
+
+### Phase 3: Drift + Gate ✅
+**Goal**: Drift detection, CI gate, incremental updates
+**Plans**: 6 plans — Complete
+
+### Phase 4: Index + Route ✅
+**Goal**: Routing index construction, Agent query interface
+**Plans**: 3 plans — Complete
+
+### Phase 999.1: MCP Server ✅
+**Goal**: Expose WTCD core capabilities via MCP protocol
+**Plans**: 3 plans — Complete
+
+</details>
 
 ---
 
 ## Phase Details
 
-### Phase 1: Foundation
-**Goal**: Users can install ANRSM, initialize a repo, configure scope, and parse TS/JS files to extract structured facts
-**Depends on**: Nothing
-**Requirements**: CORE-01, CORE-02, CORE-03, CORE-06, SCOP-01, SCOP-02, SCOP-03, LANG-01, LANG-02, LANG-03, LANG-04, LANG-05, LANG-06
+### Phase 5: Python Adapter
+**Goal**: Users can parse Python files and extract structured semantic facts (functions, classes, imports, decorators, type annotations) via the existing LanguageAdapter pipeline
+**Depends on**: Phase 1 (existing adapter infrastructure)
+**Requirements**: PY-01, PY-02, PY-03, PY-04, PY-05, PY-06, PY-07, PY-08, PY-09
 **Success Criteria** (what must be TRUE):
-  1. User can install anrsm via `cargo install` or download a pre-built binary from GitHub Releases
-  2. User can run `anrsm init` to scaffold an `anrsm.yaml` config and directory structure in any repo
-  3. User can configure include/exclude glob rules in `anrsm.yaml` and see the managed file list change deterministically
-  4. User can run `anrsm run` to parse all scoped TS/JS files and see exported symbols, function signatures, dependency edges, and detected side effects
-  5. Parser gracefully degrades on broken files — output includes `confidence: low` instead of crashing
-  6. All CLI output is JSON-structured and machine-parseable
-**Plans**: 5 plans
+  1. User can parse `.py` files via `wtcd run` and see extracted function definitions with parameter names and type annotations
+  2. User can see class definitions with base class information in the parsed output
+  3. User can see all import statements including relative imports (`from .X import Y`) in dependency edges
+  4. Decorators on functions and classes appear as metadata in the output
+  5. `__init__.py` files are recognized as package markers; `__all__` declarations filter exported symbols
+  6. Parser gracefully degrades on Python syntax errors — output includes `confidence: low` instead of crashing
+**Plans**: TBD
 
 Plans:
-- [x] 01-01-PLAN.md — Cargo workspace + wtcd-core 核心类型定义
-- [x] 01-02-PLAN.md — wtcd-scope 配置解析 + 文件扫描 ✅
-- [x] 01-03-PLAN.md — wtcd-adapters TS/JS tree-sitter 解析适配器
-- [x] 01-04-PLAN.md — wtcd-cli init/run 命令 + JSON 输出
-- [x] 01-05-PLAN.md — Golden test fixtures + 集成测试
+- [ ] 05-01: [To be planned]
+- [ ] 05-02: [To be planned]
 
-### Phase 2: Mirror + Fingerprint
-**Goal**: Parsed semantic facts are rendered as version-controllable mirror files with dual fingerprints distinguishing content changes from semantic changes
-**Depends on**: Phase 1
-**Requirements**: MIRR-01, MIRR-02, MIRR-03, MIRR-04, MIRR-05, FP-01, FP-02, FP-03
+### Phase 6: Go Adapter
+**Goal**: Users can parse Go files and extract structured semantic facts (functions, methods, types, imports, visibility) via the existing LanguageAdapter pipeline
+**Depends on**: Phase 1 (existing adapter infrastructure)
+**Requirements**: GO-01, GO-02, GO-03, GO-04, GO-05, GO-06, GO-07, GO-08, GO-09, GO-10, GO-11, GO-12
 **Success Criteria** (what must be TRUE):
-  1. User runs `anrsm run` and finds Markdown mirror files under `mirror/file/` with YAML Front Matter headers matching the `mirror-header.schema.json`
-  2. Each mirror body contains the 8 standard sections: responsibilities, external contracts, preconditions, state/control flow, side effects, invariants/risks, change impact, expand conditions
-  3. Mirror path follows deterministic mapping: `mirror/file/<source_relative_path>.md`
-  4. `source_fingerprint` changes on any text edit; `semantic_fingerprint` stays stable across whitespace/comment/formatting changes
-  5. Fingerprint algorithm includes `fp_version` field for future algorithm upgrades
-**Plans**: 5 plans in 4 waves
+  1. User can parse `.go` files via `wtcd run` and see extracted function declarations with parameter and return types
+  2. User can see method declarations with receiver types and struct fields with types and tags
+  3. User can see interface definitions with method signatures and embedded struct relationships
+  4. Export visibility is correctly determined by uppercase/lowercase first letter of identifiers
+  5. Goroutine/channel usage and compiler directives (`//go:embed`, `//go:generate`) appear as side effect metadata
+  6. Parser gracefully degrades on Go syntax errors — output includes `confidence: low` instead of crashing
+**Plans**: TBD
 
 Plans:
-- [x] 02-01-PLAN.md — wtcd-mirror crate scaffold + core types + MirrorConfig (Wave 1)
-- [x] 02-02-PLAN.md — Fingerprint engine: source + semantic dual fingerprints (Wave 2)
-- [x] 02-03-PLAN.md — Mirror template engine: 8 sections + YAML frontmatter (Wave 2)
-- [x] 02-04-PLAN.md — Mirror file I/O + manual_appendix preservation (Wave 3)
-- [x] 02-05-PLAN.md — Pipeline integration: anrsm run → mirror generation (Wave 4)
+- [ ] 06-01: [To be planned]
+- [ ] 06-02: [To be planned]
 
-### Phase 3: Drift + Gate
-**Goal**: Users and CI can detect when source changes require mirror updates, with configurable gate policies that block or warn based on drift severity
-**Depends on**: Phase 2
-**Requirements**: FP-01, DRFT-01, DRFT-02, DRFT-03, DRFT-04, GATE-01, GATE-02, GATE-03, GATE-04, GATE-05, INCR-01, INCR-02, INCR-03
+### Phase 7: Module Aggregation
+**Goal**: File-level mirror results are aggregated into module-level summaries with dependency graphs, semantic fingerprints, and drift rollup
+**Depends on**: Phase 5, Phase 6 (multi-language FileResults needed for aggregation)
+**Requirements**: MOD-01, MOD-02, MOD-03, MOD-04, MOD-05, MOD-06, MOD-07, MOD-08, MOD-09, MOD-10
 **Success Criteria** (what must be TRUE):
-  1. User runs `anrsm check` and gets a drift report classifying changed files as C0 (non-material), C1 (local material), C2 (contract material), or C3 (systemic material)
-  2. Drift analysis expands to affected neighbors — changing a file reports not just itself but files that import/depend on it
-  3. `anrsm check` outputs a structured drift report conforming to `drift-report.schema.json`
-  4. Gate policy is configurable in `anrsm.yaml` — initially defaults to warn-only mode to avoid adoption-killing false positives
-  5. Gate returns standard exit codes (0 pass, 1 fail) with ANRSM-001 to ANRSM-010 failure codes for CI pipeline integration
-  6. `anrsm run` defaults to incremental mode — only re-parses changed files and their neighbors via git diff; `--full` flag triggers full rebuild
-**Plans**: 6 plans in 4 waves
+  1. User can see module-level mirror files under `mirror/module/` containing aggregated exports, dependencies, and responsibility descriptions from all files in the module
+  2. Module boundaries are auto-detected per language (Python: `__init__.py`, Go: `package`, TS: directory) and configurable via `anrsm.yaml`
+  3. Each module has a semantic fingerprint calculated from sorted child fingerprints and a fan-in/fan-out statistics summary
+  4. Module-level drift detection rolls up C0–C3 classifications from file-level drift to the module level
+  5. Intra-module dependency graph is generated showing file-to-file relationships within each module
+**Plans**: TBD
 
 Plans:
-- [x] 03-01-PLAN.md — GateConfig + drift types in wtcd-core (Wave 1)
-- [x] 03-02-PLAN.md — Git diff with gix: wtcd-diff crate scaffold + working tree vs HEAD (Wave 2)
-- [x] 03-03-PLAN.md — Reverse dependency graph from FileResult imports (Wave 2)
-- [x] 03-04-PLAN.md — Drift classifier: C0/C1/C2/C3 + affected neighbor expansion (Wave 3)
-- [x] 03-05-PLAN.md — Gate policy evaluator with fail_on/warn_on rules (Wave 3)
-- [x] 03-06-PLAN.md — CLI integration: anrsm check + incremental run + --full flag (Wave 4)
+- [ ] 07-01: [To be planned]
+- [ ] 07-02: [To be planned]
 
-### Phase 4: Index + Route
-**Goal**: Agents and developers can query the mirror system with natural language tasks and get ranked candidate modules/files with freshness signals
-**Depends on**: Phase 3
-**Requirements**: CORE-04, CORE-05, RTIX-01, RTIX-02, RTIX-03
+### Phase 8: Knowledge Layer
+**Goal**: Users can generate repository-level knowledge documents (overview, dependency graph, export index, statistics) compiled from module mirrors
+**Depends on**: Phase 7 (module mirrors are the input)
+**Requirements**: KNOW-01, KNOW-02, KNOW-03, KNOW-04, KNOW-05, KNOW-06, KNOW-07, KNOW-08, KNOW-09
 **Success Criteria** (what must be TRUE):
-  1. A routing index is generated containing artifact IDs, module IDs, semantic keywords, and exported symbols for all mirrored files
-  2. User runs `anrsm route "modify auth logic"` and gets ranked candidate files with relevance scores and freshness state
-  3. Route results support `--top-k` flag to limit returned candidates
-  4. `anrsm check` command works end-to-end for drift detection against the current git working tree
-  5. `anrsm route` command works end-to-end, reading from the generated routing index
-**Plans**: 3 plans in 3 waves
+  1. User can find a repository overview document under `mirror/knowledge/` listing language distribution, module count, and entry points
+  2. User can see a module dependency graph in Mermaid format and a global export index across all modules
+  3. User can see language/file statistics and token compression ratio (mirror_tokens / source_tokens) in the knowledge output
+  4. User can see Agent read path suggestions derived from the dependency graph and routing index
+  5. C2/C3 drift reports generate ADR skeleton documents for architectural decision tracking
+**Plans**: TBD
 
 Plans:
-- [x] 04-01-PLAN.md — Index types + builder: RoutingIndexEntry, keyword extraction, build from FileResult (Wave 1)
-- [x] 04-02-PLAN.md — Query engine: scoring, freshness weighting, ranking, top-k (Wave 2)
-- [x] 04-03-PLAN.md — CLI integration: route command + run auto-rebuild + integration tests (Wave 3)
+- [ ] 08-01: [To be planned]
+- [ ] 08-02: [To be planned]
 
 ---
 
@@ -104,98 +126,80 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 5/5 | ✅ Complete | 2026-03-21 |
-| 2. Mirror + Fingerprint | 5/5 | ✅ Complete | 2026-03-21 |
-| 3. Drift + Gate | 6/6 | ✅ Complete | 2026-03-21 |
-| 4. Index + Route | 3/3 | ✅ Complete | 2026-03-21 |
-| 999.1. MCP Server | 3/3 | ✅ Complete | 2026-03-21 |
+| 5. Python Adapter | 0/TBD | Not started | - |
+| 6. Go Adapter | 0/TBD | Not started | - |
+| 7. Module Aggregation | 0/TBD | Not started | - |
+| 8. Knowledge Layer | 0/TBD | Not started | - |
 
 ---
 
-## Coverage Validation
+## Coverage Validation (v0.1.1)
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1 | ✅ Complete |
-| CORE-02 | Phase 1 | ✅ Complete |
-| CORE-03 | Phase 1+2 | ✅ Complete |
-| CORE-04 | Phase 3 | ✅ Complete |
-| CORE-05 | Phase 4 | ✅ Complete |
-| CORE-06 | Phase 1 | ✅ Complete |
-| SCOP-01 | Phase 1 | ✅ Complete |
-| SCOP-02 | Phase 1 | ✅ Complete |
-| SCOP-03 | Phase 1 | ✅ Complete |
-| LANG-01 | Phase 1 | ✅ Complete |
-| LANG-02 | Phase 1 | ✅ Complete |
-| LANG-03 | Phase 1 | ✅ Complete |
-| LANG-04 | Phase 1 | ✅ Complete |
-| LANG-05 | Phase 1 | ✅ Complete |
-| LANG-06 | Phase 1 | ✅ Complete |
-| MIRR-01 | Phase 2 | ✅ Complete |
-| MIRR-02 | Phase 2 | ✅ Complete |
-| MIRR-03 | Phase 2 | ✅ Complete |
-| MIRR-04 | Phase 2 | ✅ Complete |
-| MIRR-05 | Phase 2 | ✅ Complete |
-| FP-01 | Phase 2 | ✅ Complete |
-| FP-02 | Phase 2 | ✅ Complete |
-| FP-03 | Phase 2 | ✅ Complete |
-| DRFT-01 | Phase 3 | ✅ Complete |
-| DRFT-02 | Phase 3 | ✅ Complete |
-| DRFT-03 | Phase 3 | ✅ Complete |
-| DRFT-04 | Phase 3 | ✅ Complete |
-| GATE-01 | Phase 3 | ✅ Complete |
-| GATE-02 | Phase 3 | ✅ Complete |
-| GATE-03 | Phase 3 | ✅ Complete |
-| GATE-04 | Phase 3 | ✅ Complete |
-| GATE-05 | Phase 3 | ✅ Complete |
-| RTIX-01 | Phase 4 | ✅ Complete |
-| RTIX-02 | Phase 4 | ✅ Complete |
-| RTIX-03 | Phase 4 | ✅ Complete |
-| INCR-01 | Phase 3 | ✅ Complete |
-| INCR-02 | Phase 3 | ✅ Complete |
-| INCR-03 | Phase 3 | ✅ Complete |
+| PY-01 | Phase 5 | Pending |
+| PY-02 | Phase 5 | Pending |
+| PY-03 | Phase 5 | Pending |
+| PY-04 | Phase 5 | Pending |
+| PY-05 | Phase 5 | Pending |
+| PY-06 | Phase 5 | Pending |
+| PY-07 | Phase 5 | Pending |
+| PY-08 | Phase 5 | Pending |
+| PY-09 | Phase 5 | Pending |
+| GO-01 | Phase 6 | Pending |
+| GO-02 | Phase 6 | Pending |
+| GO-03 | Phase 6 | Pending |
+| GO-04 | Phase 6 | Pending |
+| GO-05 | Phase 6 | Pending |
+| GO-06 | Phase 6 | Pending |
+| GO-07 | Phase 6 | Pending |
+| GO-08 | Phase 6 | Pending |
+| GO-09 | Phase 6 | Pending |
+| GO-10 | Phase 6 | Pending |
+| GO-11 | Phase 6 | Pending |
+| GO-12 | Phase 6 | Pending |
+| MOD-01 | Phase 7 | Pending |
+| MOD-02 | Phase 7 | Pending |
+| MOD-03 | Phase 7 | Pending |
+| MOD-04 | Phase 7 | Pending |
+| MOD-05 | Phase 7 | Pending |
+| MOD-06 | Phase 7 | Pending |
+| MOD-07 | Phase 7 | Pending |
+| MOD-08 | Phase 7 | Pending |
+| MOD-09 | Phase 7 | Pending |
+| MOD-10 | Phase 7 | Pending |
+| KNOW-01 | Phase 8 | Pending |
+| KNOW-02 | Phase 8 | Pending |
+| KNOW-03 | Phase 8 | Pending |
+| KNOW-04 | Phase 8 | Pending |
+| KNOW-05 | Phase 8 | Pending |
+| KNOW-06 | Phase 8 | Pending |
+| KNOW-07 | Phase 8 | Pending |
+| KNOW-08 | Phase 8 | Pending |
+| KNOW-09 | Phase 8 | Pending |
 
-**Coverage: 38/38 v1 requirements satisfied ✅**
+**Coverage: 40/40 v0.1.1 requirements mapped ✅**
 
 ---
 
-## Pitfall Mitigations Embedded
+## Pitfall Mitigations (v0.1.1)
 
 | Pitfall | Mitigation |
 |---------|------------|
-| C1: 镜像沦为装饰 | Phase 4 builds routing index + Agent read interface as validation point |
-| C2: 门禁误报 | Phase 3 defaults to warn-only mode; FP-02 in Phase 2 ensures fingerprint normalization |
-| C3: AST 解析地雷 | Phase 1 establishes golden test suite for tree-sitter; LANG-06 mandates graceful degradation |
-| C4: 指纹跨版本不稳定 | Phase 2 FP-03 mandates fp_version field from the start |
-| C5: 镜像变第二真相源 | Phase 3 gate detects mirror-only changes; MIRR-02 includes source_artifacts |
-| C6: 全量重建杀死性能 | Phase 3 INCR-01 makes incremental the default path |
+| EXT-C1: tree-sitter 版本锁冲突 | All tree-sitter crates lock same minor version; CI compile integration test |
+| EXT-C2: Python 缩进解析边缘情况 | Test with real Django/Flask/FastAPI repos; ERROR nodes degrade to `confidence: low` |
+| EXT-C3: Go 包语义不匹配 | Parse go.mod first; group by package declaration (not directory); filter exports by case |
+| EXT-C5: 知识层生成泛化无用内容 | Only generate verifiable facts (exports, deps, structure); never generate "why" |
+| C5: 镜像成为第二真相源 | Every mirror has `source_artifacts` field; gate blocks mirror-only changes |
 
 ---
 
 ## Research Flags
 
-- **Phase 2:** 语义指纹算法的具体设计 — C1 vs C2 阈值、归一化规则需要 PoC 验证
-- **Phase 3:** C0/C1/C2 分类边界的实际验证 — 需要真实 diff 数据集
-- **Phase 4:** Agent 行为变更验证 — 需要实际使用数据
-
----
-
----
-
-## Backlog
-
-### Phase 999.1: MCP Server — 将 WTCD 核心能力通过 MCP 协议暴露给 Agent ✅ COMPLETE
-
-**Goal:** Agent 可以通过 MCP 协议自动发现并使用 WTCD 的解析和扫描能力，无需手动调用 CLI
-**Requirements:** N/A (backlog phase, not mapped to v1 requirements)
-**Plans:** 3 plans ✅
-
-Plans:
-- [x] 999.1-01-PLAN.md — wtcd-mcp crate scaffold + MCP Server 核心（4 个 MCP Tool）
-- [x] 999.1-02-PLAN.md — CLI 集成：`wtcd mcp` + `wtcd mcp-install` 子命令
-- [x] 999.1-03-PLAN.md — 端到端验证 + MCP 规范文档
+- **Phase 7 (Module Aggregation):** Module boundary definition needs ADR — Python `__init__.py` vs Go `package` vs TS directory unification
+- **Phase 8 (Knowledge Layer):** Output depth/format needs alignment with actual Agent consumption patterns
 
 ---
 
 *Roadmap created: 2026-03-21*
-*Ready for: `/gsd-plan-phase 1`
+*Ready for: `/gsd-plan-phase 5`*

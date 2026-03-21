@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v0.1.1
 milestone_name: multi-language-and-knowledge
-status: defining_requirements
-last_updated: "2026-03-21T18:45:00.000Z"
+status: roadmap_created
+last_updated: "2026-03-21T19:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -14,9 +14,9 @@ progress:
 # STATE.md — WTCD Project Memory
 
 **Last updated:** 2026-03-21
-**Phase:** Not started (defining requirements)
+**Phase:** 5 of 8 (Python Adapter)
 **Plan:** —
-**Status:** ◆ DEFINING REQUIREMENTS — Milestone v0.1.1
+**Status:** ◆ ROADMAP CREATED — Ready to plan Phase 5
 
 ---
 
@@ -24,7 +24,7 @@ progress:
 
 **Core Value:** 让 AI Agent 的默认读取行为从"吞源码"变为"先读镜像"，用最小充分上下文完成工程决策。
 
-**Current Focus:** Milestone v0.1.1 — extending to multi-language support (Python, Go) and knowledge layer generation
+**Current Focus:** Milestone v0.1.1 — Multi-Language & Knowledge Layer (Phases 5–8)
 
 ---
 
@@ -33,11 +33,15 @@ progress:
 **Previous Milestone:** v1.0 — 5 phases, 22 plans, 160 tests, 8 crates, pushed to origin/main
 Audit: .planning/v1.0-MILESTONE-AUDIT.md (status: passed, 38/38 requirements)
 
-**This Milestone:** v0.1.1 — Multi-Language & Knowledge Layer
-- Python 语言适配器
-- Go 语言适配器
-- 模块级镜像聚合
-- 知识层文档生成
+**This Milestone:** v0.1.1 — 4 phases, 40 requirements
+| Phase | Goal | Requirements |
+|-------|------|--------------|
+| 5. Python Adapter | Python tree-sitter 适配器 | PY-01 ~ PY-09 (9) |
+| 6. Go Adapter | Go tree-sitter 适配器 | GO-01 ~ GO-12 (12) |
+| 7. Module Aggregation | 模块级镜像聚合 | MOD-01 ~ MOD-10 (10) |
+| 8. Knowledge Layer | 知识层文档生成 | KNOW-01 ~ KNOW-09 (9) |
+
+Progress: [░░░░░░░░░░] 0%
 
 ---
 
@@ -47,27 +51,20 @@ Audit: .planning/v1.0-MILESTONE-AUDIT.md (status: passed, 38/38 requirements)
 
 | Decision | Status |
 |----------|--------|
-| 项目名 ANRSM → **WTCD** (What The Code Doing) | Locked — 所有 crate 使用 wtcd- 前缀 |
-| tree-sitter 0.26 > SWC > Oxc for parsing | Locked — multi-language unified API, error recovery |
-| gix 0.80 > git2 for Git operations | Locked — pure Rust, no C deps, v1 read-only needs covered |
-| Trait-based adapter (compile-time) > dynamic plugins | Locked — ABI safety, v1 scope doesn't need runtime plugins |
-| JSON 输出：单层扁平 + version 字段 | Locked — files[]/summary + api_version |
-| Confidence 三级：high/low/none | Locked — tree-sitter partial CST → low |
-| Phase 1 五 crate workspace (含 wtcd-tests) | Locked — wtcd-core, wtcd-scope, wtcd-adapters, wtcd-cli, wtcd-tests |
-| Integration tests 在 dedicated crate | Locked — Cargo virtual manifest 不支持 dev-dependencies |
-| Phase 2: SHA-256 for fingerprints | Locked — matches mirror-header.schema.json |
-| Phase 3: gix 0.63 for pure Rust git diff | Locked — D-01 (0.80 requires Rust 1.88) |
-| Phase 4: routing_index.json in mirror/ directory | Locked — D-01 |
-| Phase 999.1: rmcp 1.2.0 as MCP SDK | Locked — user directive, latest stable |
+| 项目名 ANRSM → **WTCD** (What The Code Doing) | Locked |
+| tree-sitter 0.26 + tree-sitter-language ^0.1 桥接 | Locked — Python/Go 语法库通过此桥接兼容 |
+| Trait-based adapter (compile-time) > dynamic plugins | Locked — PyAdapter/GoAdapter 实现 LanguageAdapter |
+| Python 先行：tree-sitter-python 下载量 5.2M > Go 3.8M | Phase 5 作为 tree-sitter 多语法集成验证 |
+| 模块边界：auto-detect + anrsm.yaml 可选覆盖 | Phase 7 需要 ADR 确认 |
+| 知识层只生成可验证事实，不生成 "why" | Locked — 避免 EXT-C5 泛化无用内容 |
 
 ### Active Todos
 
-- [ ] Define requirements for v0.1.1
-- [ ] Research Python tree-sitter integration
-- [ ] Research Go tree-sitter integration
-- [ ] Design module-level mirror aggregation
-- [ ] Design knowledge layer document generation
-- [ ] Create roadmap for v0.1.1
+- [x] Define requirements for v0.1.1
+- [x] Research Python/Go tree-sitter integration
+- [x] Create roadmap for v0.1.1
+- [ ] Plan Phase 5: Python Adapter
+- [ ] Plan Phase 6: Go Adapter
 
 ### Blockers
 
@@ -94,4 +91,4 @@ None currently.
 ---
 
 *Created: 2026-03-21 after roadmap initialization*
-*Last session: 2026-03-21 — Started Milestone v0.1.1 — Multi-Language & Knowledge Layer*
+*Last session: 2026-03-21 — Roadmap created for v0.1.1 — Phases 5–8*

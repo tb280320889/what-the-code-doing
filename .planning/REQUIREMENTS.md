@@ -111,10 +111,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PY-01 ~ PY-09 | Phase 6 | Pending |
-| GO-01 ~ GO-12 | Phase 7 | Pending |
-| MOD-01 ~ MOD-10 | Phase 8 | Pending |
-| KNOW-01 ~ KNOW-09 | Phase 9 | Pending |
+| PY-01 ~ PY-09 | Phase 5 | Pending |
+| GO-01 ~ GO-12 | Phase 6 | Pending |
+| MOD-01 ~ MOD-10 | Phase 7 | Pending |
+| KNOW-01 ~ KNOW-09 | Phase 8 | Pending |
 
 **Coverage:**
 - v0.1.1 requirements: 40 total
