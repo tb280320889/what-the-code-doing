@@ -14,9 +14,9 @@ progress:
 # STATE.md — WTCD Project Memory
 
 **Last updated:** 2026-03-21
-**Phase:** 4
+**Phase:** 999.1
 **Plan:** COMPLETE
-**Status:** Phase 04-index-route complete — 3 plans, 32 new tests, 160 total
+**Status:** Phase 999.1 MCP Server complete — 3 plans, 12 files created, MCP tools verified E2E
 
 ---
 
@@ -34,7 +34,7 @@ Phase: 01 (foundation) — COMPLETE
 Phase: 02 (mirror + fingerprint) — COMPLETE (5 plans, 106 tests)
 Phase: 03 (drift + gate) — COMPLETE (6 plans, 22 new tests, 128 total)
 Phase: 04 (index + route) — COMPLETE (3 plans, 32 new tests, 160 total)
-Phase: 999.1 (MCP Server) — PLANNED (3 plans, 3 waves)
+Phase: 999.1 (MCP Server) — COMPLETE (3 plans, 12 files, MCP E2E verified)
 Plan: Ready for next phase
 
 ## Performance Metrics
@@ -64,6 +64,9 @@ Plan: Ready for next phase
 | Phase 04-index-route 04-01 | ~10min | 1 step (TDD) | 2 files |
 | Phase 04-index-route 04-02 | included in 04-01 | — | — |
 | Phase 04-index-route 04-03 | ~5min | 3 steps | 5 files |
+| Phase 999.1-mcp 01 | ~15min | 2 steps | 10 files |
+| Phase 999.1-mcp 02 | ~10min | 2 steps | 6 files |
+| Phase 999.1-mcp 03 | ~5min | 2 steps | 1 file |
 
 ## Accumulated Context
 
@@ -110,6 +113,11 @@ Plan: Ready for next phase
 | Phase 4: Score = hits/query_tokens × freshness_weight | Locked — D-07 |
 | Phase 4: route reads index from disk | Locked — D-13 |
 | Phase 4: run auto-rebuilds index | Locked — D-14 |
+| Phase 999.1: rmcp 1.2.0 as MCP SDK | Locked — user directive, latest stable |
+| Phase 999.1: schemars 1.1.0 for JSON Schema | Locked — rmcp 1.x compatibility |
+| Phase 999.1: Rust 1.92 toolchain | Locked — rmcp 1.2.0 requires 1.88+ |
+| Phase 999.1: stdio-only transport (D-03) | Locked — local mode, no HTTP/SSE |
+| Phase 999.1: 4 MCP tools (parse+run full, check+mirror stub) | Locked — D-06, D-10 |
 
 ### Active Todos
 
@@ -134,9 +142,9 @@ Plan: Ready for next phase
 - [x] Phase 04: query engine scoring + ranking (04-02)
 - [x] Phase 04: CLI route command + run auto-rebuild + integration tests (04-03)
 - [x] Phase 999.1 plan: MCP Server phase (3 plans created)
-- [ ] Phase 999.1: Execute wtcd-mcp crate scaffold + tools (Plan 01)
-- [ ] Phase 999.1: Execute CLI integration (Plan 02)
-- [ ] Phase 999.1: Execute verification + docs (Plan 03)
+- [x] Phase 999.1: Execute wtcd-mcp crate scaffold + tools (Plan 01)
+- [x] Phase 999.1: Execute CLI integration (Plan 02)
+- [x] Phase 999.1: Execute verification + docs (Plan 03)
 - [ ] MSRV unification (clap 4.5 vs 4.6, jsonschema version)
 - [ ] 更新 PROJECT.md/ROADMAP.md/REQUIREMENTS.md 中的项目名 ANRSM → WTCD
 
@@ -165,4 +173,4 @@ None currently.
 ---
 
 *Created: 2026-03-21 after roadmap initialization*
-*Last session: 2026-03-21 — Completed Phase 04 (index + route) — 3 plans, 32 new tests, 160 total*
+*Last session: 2026-03-21 — Completed Phase 999.1 (MCP Server) — 3 plans, wtcd-mcp crate, CLI integration, E2E verified, Rust 1.92*
