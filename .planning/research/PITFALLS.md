@@ -442,6 +442,414 @@
 
 ---
 
+## Multi-Language & Knowledge Layer Extension Pitfalls
+
+*Added 2026-03-21 — Specific pitfalls for v0.1.1 milestone: Python/Go adapters, module aggregation, knowledge layer*
+
+---
+
+### Critical Extension Pitfalls
+
+#### EXT-C1: Tree-sitter Version Lock Conflict Between Adapters
+
+**What goes wrong:** Adding `tree-sitter-python` and `tree-sitter-go` creates dependency conflicts with existing `tree-sitter-typescript`. After tree-sitter 0.25.x, generated C parsers changed `static` to `const` for character sets, causing **linker symbol collisions** when multiple grammars compile into the same binary.
+
+**Why it happens:** Each grammar crate pins its own `tree-sitter` dependency. Cargo resolves to potentially different versions, producing incompatible C parser code.
+
+**Consequences:**
+```
+error: linking with `cc` failed: multiple definition of `sym_identifier_character_set_1`
+```
+
+**Warning signs:**
+- `cargo build` fails with symbol collision errors after adding second grammar
+- Different tree-sitter versions in `Cargo.lock`
+- CI passes locally but fails on clean builds
+
+**Prevention:**
+1. **Pin ALL tree-sitter crates to exact same minor version**:
+   ```toml
+   tree-sitter = "0.25"
+   tree-sitter-python = "0.25.0"
+   tree-sitter-go = "0.25.0"
+   tree-sitter-typescript = "0.25.0"
+   ```
+2. **Add integration test compiling all adapters together** before each PR
+3. **Monitor tree-sitter releases** for grammar ABI changes
+
+**Phase:** Phase 1 (Python Adapter) — establish pattern early, reuse for Go
+
+---
+
+#### EXT-C2: Python Indentation Parser Edge Cases
+
+**What goes wrong:** Python's indentation-based syntax creates tree-sitter edge cases that don't exist in brace-delimited languages:
+- Mixed tabs/spaces (Python 3 forbids but parser must handle)
+- Dedent after error recovery producing malformed trees
+- `match` statements (Python 3.10+) with complex pattern matching
+- Async comprehensions (Python 3.13+) not covered by older grammars
+
+**Why it happens:** Python grammar uses an **external C scanner** for indentation tracking — more complex than pure grammar rules. Scanner bugs surface as incomplete or incorrect parse trees.
+
+**Consequences:**
+- Mirror generation silently skips common Python files
+- Incomplete extraction of decorated functions, nested classes
+- Crash on edge-case Python that real codebases contain
+
+**Warning signs:**
+- Parser produces ERROR nodes on valid Python
+- Decorated functions missing from mirror output
+- `@property` or `@contextmanager` patterns not extracted
+
+**Prevention:**
+1. **Test against real Python repos** (Django, Flask, FastAPI) not synthetic examples
+2. **Handle ERROR nodes gracefully** — emit partial mirror with `confidence: low`
+3. **Pin `tree-sitter-python` to stable** (0.25.0 as of 2025-09)
+4. **Parse timeout** (5s) — abort and log, don't hang
+
+**Phase:** Phase 1 (Python Adapter) — must resolve before production
+
+---
+
+#### EXT-C3: Go Package Semantics Mismatch
+
+**What goes wrong:** Go's package system is fundamentally different from TypeScript/Python:
+- Files belong to packages (same `package` declaration), not directories with `index`/`__init__`
+- `go.mod` defines module root and dependencies
+- `internal/` has compiler-enforced visibility semantics
+- No explicit export list — capitalization determines visibility
+
+**Why it happens:** Adapters designed for TS/Python patterns produce incorrect structure for Go repos.
+
+**Consequences:**
+- Module boundaries detected incorrectly (each file treated as independent)
+- Missing cross-file type relationships
+- Incorrect mirror hierarchy that doesn't match `go list ./...`
+- Export list wrong (includes unexported names)
+
+**Warning signs:**
+- Mirror shows files as independent modules
+- `internal/` packages exposed in public API mirror
+- Cross-file interface implementations not linked
+
+**Prevention:**
+1. **Parse `go.mod` first** to establish module root
+2. **Group files by `package` declaration**, not directory
+3. **Filter exports by capitalization** (uppercase = exported)
+4. **Respect `internal/` visibility** in mirror output
+5. **Test against Go stdlib patterns** and popular repos (gin, kubernetes)
+
+**Phase:** Phase 2 (Go Adapter) — design with Go conventions from start
+
+---
+
+#### EXT-C4: Module-Level "Module" Definition Ambiguity
+
+**What goes wrong:** Aggregating file mirrors to module level requires defining "what is a module?" — but this varies:
+- **TypeScript**: npm package, directory with `index.ts`, or logical grouping
+- **Python**: package with `__init__.py`, namespace package, or single `.py` file
+- **Go**: directory with same `package` declaration
+
+**Why it happens:** No language-agnostic definition of "module" works correctly across all three.
+
+**Consequences:**
+- Inconsistent aggregation boundaries between languages
+- Module mirrors too large (whole directory) or too small (single file)
+- Agent can't navigate hierarchy predictably
+
+**Warning signs:**
+- Module mirror > 10KB (too aggregated)
+- Module mirror = one file's mirror (pointless aggregation)
+- Different language repos produce wildly different module counts
+
+**Prevention:**
+1. **Define `module_boundary()` per adapter**:
+   ```rust
+   trait LanguageAdapter {
+       fn module_boundary(&self, path: &Path) -> ModuleBoundary;
+       fn aggregate_strategy(&self) -> AggregationStrategy;
+   }
+   ```
+2. **Set size guidance**: module summary 1-3KB, file list with summaries not full content
+3. **Test aggregation with real multi-language monorepos**
+4. **Allow user override** via `anrsm.yaml` for custom module definitions
+
+**Phase:** Phase 3 (Module Aggregation) — design aggregation strategy before implementation
+
+---
+
+#### EXT-C5: Knowledge Layer Generates Useless Generic Content
+
+**What goes wrong:** Auto-generated knowledge documents that:
+- Restate what code obviously does (`// This function validates input`)
+- Miss the "why" behind architectural decisions
+- Become stale immediately after generation
+- Provide false confidence that documentation exists
+
+**Why it happens:** Tree-sitter extracts **syntax structure**, not **semantic intent**. Knowledge layer has no access to:
+- Why specific patterns were chosen
+- What alternatives were rejected
+- Business context driving design
+- Performance constraints or trade-offs
+
+**Consequences:**
+- Agents rely on misleading documentation
+- Human developers stop trusting ALL documentation
+- Maintenance burden of docs that add zero value
+- **Worse than no documentation** — creates false confidence
+
+**Warning signs:**
+- Knowledge docs read the same across different modules
+- No `source_artifacts` linking to specific code locations
+- Agents ignore knowledge layer (or follow incorrect guidance from it)
+- "Why was this designed this way?" answered with "because it provides X functionality"
+
+**Prevention:**
+1. **Generate STRUCTURE not CONTENT**: module boundaries, export lists, dependency graphs
+2. **Extract verifiable facts only**: "exports X, Y, Z" not "provides authentication services"
+3. **Include confidence indicators**: mark low-confidence extractions
+4. **Make knowledge layer optional**: don't gate CI on knowledge generation
+5. **Support human annotations**: allow overlay files that add context AI can't infer
+6. **Never generate "why"** — only generate "what" and "how"
+
+**Phase:** Phase 4 (Knowledge Layer) — scope carefully, avoid over-promising
+
+---
+
+### Moderate Extension Pitfalls
+
+#### EXT-M1: cgo Build Complexity for Go Parser
+
+**What goes wrong:** Tree-sitter Go grammar uses C FFI. Your Rust CLI including Go grammar may hit:
+- Build failures if C compiler not available
+- Cross-compilation issues (macOS vs Linux vs Windows)
+- External scanner include path errors (`tree_sitter/parser.h` not found)
+
+**Why it happens:** [tree-sitter#5421](https://github.com/tree-sitter/tree-sitter/issues/5421) documents Go binding include path issues. External scanners use `#include <tree_sitter/parser.h>` which may not resolve in your build setup.
+
+**Consequences:**
+- Binary doesn't compile on CI
+- Users need C toolchain installed
+- Increased build time and binary size
+
+**Prevention:**
+1. **Verify build on all target platforms** in CI matrix
+2. **Test cross-compilation** for release targets early
+3. **Consider static linking** of all grammars
+4. **Document C compiler requirement** if needed
+
+**Phase:** Phase 2 (Go Adapter) — validate build matrix before merging
+
+---
+
+#### EXT-M2: Cross-Language Type Reference Gap
+
+**What goes wrong:** In monorepos with TS + Python + Go, types flow across language boundaries (API contracts, protobuf, OpenAPI). Adapters processing languages in isolation miss these connections.
+
+**Why it happens:** Each adapter has no mechanism to link:
+- TypeScript interface ↔ Go struct (via protobuf)
+- Python function ↔ TypeScript API endpoint
+- Shared configuration schemas
+
+**Consequences:**
+- Incomplete dependency graph
+- Impact analysis misses cross-language effects
+- Agents can't trace cross-language call chains
+
+**Warning signs:**
+- Monorepo with shared API contract but mirror shows no cross-references
+- PR changes protobuf but mirror doesn't flag affected languages
+
+**Prevention:**
+1. **Don't solve in v0.1.1** — this is a v2 problem
+2. **Emit structured IDs** that could link later (`file:line:export_name`)
+3. **Document limitation** in mirror header
+4. **Support manual cross-references** via `anrsm.yaml`
+
+**Phase:** Out of scope for v0.1.1 — flag for future milestone
+
+---
+
+#### EXT-M3: Configuration Complexity Explosion
+
+**What goes wrong:** Adding per-language config options that:
+- Require understanding all languages to configure
+- Have conflicting defaults between adapters
+- Become impossible to validate statically
+
+**Why it happens:** Each adapter introduces quirks and tuning knobs. Temptation to expose all in `anrsm.yaml`.
+
+**Consequences:**
+- Users misconfigure and get bad output
+- Support burden explaining config options
+- Config file becomes as complex as the code it describes
+
+**Warning signs:**
+- `anrsm.yaml` > 50 lines
+- Users ask "what does `python.indent_style` do?"
+- Different team members have different config
+
+**Prevention:**
+1. **Sensible defaults per adapter** — config only for overrides
+2. **Language-specific sections** with clear namespacing:
+   ```yaml
+   adapters:
+     typescript: {}
+     python:
+       indent_style: spaces  # only if differs from default
+     go: {}
+   ```
+3. **Config validation at init time**, not generation time
+4. **Minimal surface area**: only expose options that change output quality
+
+**Phase:** Throughout — resist adding config without strong justification
+
+---
+
+#### EXT-M4: Aggregation Size Explosion
+
+**What goes wrong:** Naive module aggregation produces mirrors so large they defeat the purpose — Agent reads the module mirror but it's as long as reading individual files.
+
+**Why it happens:** No size limits, no summarization, just concatenating file mirrors.
+
+**Consequences:**
+- Agent token savings disappear
+- Module mirror takes longer to read than source files
+- Users disable module aggregation
+
+**Warning signs:**
+- Module mirror > 5KB
+- Module mirror contains full function bodies
+- Agent reads module + all files anyway
+
+**Prevention:**
+1. **Set hard size limit**: module summary max 2-3KB
+2. **Summarize don't concatenate**: exports list, dependency summary, key patterns
+3. **File list with brief descriptions**, not full file mirrors
+4. **Test with real large modules** (50+ files)
+
+**Phase:** Phase 3 (Module Aggregation) — design limits before implementation
+
+---
+
+#### EXT-M5: Adapter Test Coverage Gaps
+
+**What goes wrong:** Writing adapter tests only for happy paths, missing:
+- Malformed code (syntax errors, incomplete files)
+- Edge-case syntax (decorators, generics, type aliases, macros)
+- Large files (performance)
+- Encoding issues (non-UTF8, mixed line endings)
+- Language-specific quirks (Python f-strings, Go build tags)
+
+**Consequences:**
+- Production crashes on real-world code
+- Silent data loss (skipped files without warning)
+- Performance regressions undetected
+
+**Prevention:**
+1. **Test against corpus of real repos** for each language
+2. **Fuzz testing** with malformed input
+3. **Performance benchmarks** on large files (>10K lines)
+4. **Test matrix**: UTF-8, UTF-16, LF, CRLF, tabs
+
+**Phase:** Phase 1-2 — establish test pattern with Python, reuse for Go
+
+---
+
+### Minor Extension Pitfalls
+
+#### EXT-m1: Binary Size Bloat
+
+**What goes wrong:** Each tree-sitter grammar adds ~200-500KB. With TS + Python + Go, binary grows significantly.
+
+**Prevention:**
+1. **Use feature flags** for optional language support
+2. **Monitor binary size** in CI as regression check
+3. **Consider plugin architecture** for v2
+
+**Phase:** Phase 2 — monitor size, optimize if >50MB
+
+---
+
+#### EXT-m2: Incremental Parsing Not Leveraged
+
+**What goes wrong:** Re-parsing entire files when tree-sitter supports incremental parsing. Wastes CPU on large repos with many languages.
+
+**Prevention:**
+1. **Cache parse trees** between runs (file hash → tree)
+2. **Use incremental parsing** for small changes
+3. **Benchmark before/after** to validate
+
+**Phase:** Phase 3+ — optimization, not MVP
+
+---
+
+#### EXT-m3: Language Detection Edge Cases
+
+**What goes wrong:** Ambiguous file extensions (`.h` could be C or C++), no extension (Makefile, Dockerfile), or polyglot files (JSX in `.js`).
+
+**Prevention:**
+1. **Explicit language mapping** in config as override
+2. **Fallback chain**: extension → shebang → content heuristics
+3. **User can force language** via `anrsm.yaml`
+
+**Phase:** Phase 1 — establish detection pattern early
+
+---
+
+## Extension Phase-Specific Warnings
+
+| Phase | Topic | Critical Pitfall | Mitigation |
+|-------|-------|------------------|------------|
+| Phase 1 | Python Adapter | EXT-C2 Indentation edge cases | Test against Django/Flask/FastAPI |
+| Phase 1 | Python Adapter | EXT-C1 tree-sitter version lock | Pin exact version, test with TS |
+| Phase 1 | All Adapters | EXT-m3 Language detection | Extension + fallback chain |
+| Phase 2 | Go Adapter | EXT-C3 Package semantics | Parse go.mod, group by package |
+| Phase 2 | Go Adapter | EXT-M1 cgo build issues | CI matrix for all platforms |
+| Phase 2 | Binary | EXT-m1 Size bloat | Feature flags, monitor size |
+| Phase 3 | Module Aggregation | EXT-C4 Module definition | Per-language boundary function |
+| Phase 3 | Module Aggregation | EXT-M4 Size explosion | Hard 2-3KB limit |
+| Phase 4 | Knowledge Layer | EXT-C5 Generic/useless output | Facts only, no "why" generation |
+| Phase 4 | Knowledge Layer | EXT-M2 Cross-language gap | Emit linkable IDs, document limitation |
+| All | Configuration | EXT-M3 Config complexity | Minimal defaults, language sections |
+| All | Testing | EXT-M5 Coverage gaps | Real repo corpus, fuzz testing |
+
+---
+
+## Extension Pitfall: Interaction with Existing System
+
+These pitfalls arise from how new features interact with existing WTCD capabilities:
+
+| Existing Feature | New Feature | Interaction Risk | Mitigation |
+|------------------|-------------|------------------|------------|
+| Fingerprint (M2) | Python/Go adapters | Fingerprints may not be comparable cross-language | Normalize fingerprint algorithm across adapters |
+| Drift detection (M2) | Module aggregation | Module drift aggregates file-level noise | Separate module-level C0 filtering |
+| CI gate (M3) | Knowledge layer | Gate shouldn't block on knowledge generation | Knowledge layer as optional output |
+| Route index (M4) | Multi-language | Routes must span languages | Route index language-agnostic |
+| Agent integration (M4) | All new features | Agent read order must handle mixed-language repos | Read order includes language hints |
+
+---
+
+## Sources (Extension)
+
+### Tree-sitter Specific
+- [tree-sitter#4209](https://github.com/tree-sitter/tree-sitter/issues/4209): Linker symbol conflicts with multiple grammars (2025-02)
+- [tree-sitter-python#324](https://github.com/tree-sitter/tree-sitter-python/issues/324): Rust bindings compatibility (2026-01)
+- [tree-sitter#5421](https://github.com/tree-sitter/tree-sitter/issues/5421): Go binding include path issues (2026-03)
+- [tree-sitter#3625](https://github.com/tree-sitter/tree-sitter/issues/3625): Multi-language injection challenges
+
+### Knowledge Layer / Documentation Generation
+- [AI Documentation Debt](https://techdebt.guru/ai-documentation-debt/) — stale-on-arrival, verbose emptiness
+- [AI-Generated Documentation Limits](https://www.jamesrossjr.com/blog/ai-documentation-generation) — what it can/can't replace
+- [Code Documentation 2026](https://howworks.com/blog/code-documentation) — auto-generation pitfalls
+
+### Go/Python Language Specific
+- [Tree-sitter Python Grammar](https://crates.io/crates/tree-sitter-python) — 0.25.0, Python 3.12 coverage
+- [gotreesitter](https://github.com/odvcencio/gotreesitter) — Pure Go tree-sitter runtime, 206 grammars
+- [Tinkering with Tree-Sitter in Go](https://dev.to/shrsv/tinkering-with-tree-sitter-using-go-4d8n) — Go binding patterns
+
+---
+
 ## Sources
 
 ### Internal

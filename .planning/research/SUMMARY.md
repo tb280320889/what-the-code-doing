@@ -1,17 +1,17 @@
 # Project Research Summary
 
-**Project:** ANRSM — AI Native Repo Semantic Mirror
-**Domain:** Rust CLI — 代码语义镜像系统（Code Semantic Mirror System）
+**Project:** ANRSM v0.1.1 — Multi-Language & Knowledge Layer
+**Domain:** Rust CLI for code repository semantic mirror generation
 **Researched:** 2026-03-21
 **Confidence:** HIGH
 
 ## Executive Summary
 
-ANRSM 是一个 Rust CLI 工具，为 AI Agent 生成与源码一一映射的持久化语义镜像。它填补了一个结构性空白：现有工具要么面向人类（Doxygen/TypeDoc），要么不持久化中间层（Cursor/Copilot），要么聚焦搜索而非可验证的语义新鲜度（Sourcegraph/CocoIndex）。ANRSM 的核心差异化在于——**语义指纹 + 漂移检测**让"文档是否过期"变成可验证的数学问题，而非主观判断。
+ANRSM 是一个面向 Agent 的代码语义镜像工具，通过 tree-sitter 解析源码生成结构化镜像，供 AI Agent 高效消费。当前版本仅支持 TypeScript/JavaScript，v0.1.1 里程碑的核心目标是扩展到 Python 和 Go 语言，并新增模块级聚合和知识层两个抽象层级，形成**文件镜像 → 模块镜像 → 知识层**的三层架构。
 
-技术栈已收敛到高信心方案：**clap 4.6**（CLI 事实标准）+ **tree-sitter 0.26**（多语言统一解析框架，容错/增量解析）+ **gix 0.80**（纯 Rust Git 操作，无 C 依赖）+ **serde 生态**（序列化层）。架构遵循控制面/数据面分离 + Trait 驱动语言适配器 + 流水线模式，以 workspace crates 组织代码。参考项目 codegraph 和 NekoCode 验证了 Rust + Tree-sitter 多语言代码分析的可行性。
+推荐方案是**纯增量式扩展**：Python 和 Go 适配器通过实现已有的 `LanguageAdapter` trait 加入现有流水线，无需修改核心架构。模块聚合在文件镜像之上新增中间层，知识层作为最顶层消费者从模块镜像编译仓库级文档。整个方案零新增 LLM 依赖，tree-sitter 生态通过 `tree-sitter-language ^0.1` 桥接层确保版本兼容。构建顺序受硬依赖约束：适配器先行（并行开发），模块聚合次之，知识层最后。
 
-最大的风险不在技术选型，而在**价值闭环验证**：Agent 是否真的会改变读取行为、门禁误报率能否控制在可接受范围、指纹跨版本是否稳定。研究明确识别了 6 个 Critical Pitfall，其中"C1 镜像沦为装饰"和"C2 门禁误报导致绕过"是最可能杀死项目的两个失败模式。预防策略已到位：强制读取顺序、warn-only 初期模式、指纹版本化协议、golden test suite。
+最大风险来自三个方向：**tree-sitter 版本冲突**（多语法库编译时的链接器符号碰撞）、**Python 缩进解析边缘情况**（外部 C scanner 的复杂性）、以及**知识层生成无用的泛化内容**（只有语法结构没有语义意图）。预防策略已在 PITFALLS.md 中详细记录，核心原则是"只生成可验证的事实，不生成无法验证的 why"。
 
 ## Key Findings
 
@@ -19,182 +19,167 @@ ANRSM 是一个 Rust CLI 工具，为 AI Agent 生成与源码一一映射的持
 
 详见 [STACK.md](./STACK.md)。
 
-**核心技术：**
-- **clap 4.6**: CLI 参数解析与子命令 — Rust CLI 事实标准，722M+ 下载，Derive API 声明式定义，自动生成 help/shell completions
-- **tree-sitter 0.26**: 多语言统一解析（CST）— 多语言适配器架构的基础，容错解析处理不完整源码，无 serde 序列化开销
-- **gix 0.80**: 纯 Rust Git 操作 — 无 C/OpenSSL 依赖，跨平台编译简单，读操作已 production-grade（7.4M+ 下载）
-- **serde + serde_json + yaml_serde 0.10**: 序列化统一层 — yaml_serde 由 YAML 官方组织维护，serde_yaml 已停止维护
-- **sha2 0.10**: SHA-256 语义指纹计算 — RustCrypto 稳定 API，支持增量 hashing
+**Core technologies:**
+- **tree-sitter-python 0.25.0**: Python 语法解析 — 最新稳定版，与项目现有 tree-sitter 0.26.7 通过 `tree-sitter-language ^0.1` 桥接兼容，5.2M+ 下载验证
+- **tree-sitter-go 0.25.0**: Go 语法解析 — 同一桥接层，3.8M+ 下载，Go AST 结构清晰（function_declaration vs method_declaration）
+- **tree-sitter-md 0.5.3** (optional): Markdown 结构化解析 — 用于知识层 ADR/文档提取，默认不启用，用户可通过 feature flag 按需开启
+- **pulldown-cmark 0.13** (已有): 知识层默认 Markdown 解析方案 — 零新依赖，提取标题/段落/前端数据足够
+- **yaml_serde 0.10** (已有): YAML Front Matter 解析 — 复用于镜像头部和知识层
 
-**关键决策：tree-sitter > SWC > Oxc**
-- tree-sitter 胜出原因：多语言统一 API、容错解析、无序列化开销、生态验证（Neovim/Helix/GitHub/ast-grep）
-- SWC 作为备选（若 tree-sitter 提取不足时切换）
-- Oxc 关注中（2026 H2 重新评估，MSRV 1.92 过高，API 不稳定）
+**关键兼容性决策：** tree-sitter 0.23+ 通过 `tree-sitter-language ^0.1` 桥接 crate 统一版本，语法库不再直接依赖特定 tree-sitter 版本。项目已验证此模式（tree-sitter-typescript 0.23 + tree-sitter 0.26 正常工作），Python 和 Go 适配器遵循相同模式。
+
+**不需要新增的依赖：** rustpython-parser（过重）、syn（不适用）、pest/nom（tree-sitter 已覆盖）、rayon（当前性能足够）、walkdir（已有 ignore crate）。
 
 ### Expected Features
 
 详见 [FEATURES.md](./FEATURES.md)。
 
-**Must have（基线特性，缺失 = 用户离开）：**
-- AST 级代码解析 — 所有竞品都有
-- 符号提取与依赖图 — Sourcegraph/Cursor/CocoIndex 均提供符号级索引
-- 多语言支持架构 — v1 聚焦 TS/JS，架构必须支持插件化适配器
-- 增量更新 — 基于 git diff 的变更集驱动，全量重建会杀死性能
-- CLI 可用性 + 配置文件驱动 — CLI init/generate/diff/check 子命令
-- JSON 结构化输出 — Agent 生态期望结构化数据
+**Must have (table stakes):**
+- **Python 适配器** — 函数/类定义提取、import 语句（含相对导入）、装饰器检测、类型注解提取、语法错误容忍、`__init__.py` 处理
+- **Go 适配器** — 函数/方法声明提取、struct/interface/type 提取、import 语句、常量/变量提取、首字母大小写可见性判断、语法错误容忍
+- **模块级镜像聚合** — 模块级导出汇总、依赖汇总、职责描述、文件列表索引、副作用汇总
+- **知识层文档** — 仓库总览、模块关系图（Mermaid）、导出索引、语言/文件统计
 
-**Should have（差异化特性，定义品类）：**
-- 语义镜像持久化层 — 与源码一一映射的可版本管理工件（竞品无此能力）
-- 语义指纹 + 漂移检测 — C0/C1/C2/C3 四级语义变化分类（核心差异点）
-- Agent 读取顺序契约 — 强制"先路由 → 镜像 → 源码"行为约束
-- Freshness State 机器 — fresh/stale/invalid/unknown 四态
-- 两段式生成流水线 — 结构化提取 → 语义压缩（公理 A4）
-- 路由索引 — 预计算任务→模块映射，vs Sourcegraph 实时查询
+**Should have (competitive):**
+- Python: `__all__` 解析、相对导入解析、`@property`/`@staticmethod` 方法类型识别、dataclass/Pydantic 检测
+- Go: Method Receiver 提取、struct 字段提取、interface 方法列表、嵌入式结构体识别、goroutine/channel 检测、`//go:embed` 指令
+- 模块: 模块内依赖图、模块边界自动检测、模块级指纹、模块级漂移检测、扇入/扇出统计
+- 知识层: 语义聚类（社区发现）、变更热点图、Token 压缩报告、Agent 读取路径建议、ADR 自动骨架
 
-**Defer（v2+）：**
-- Web UI / Dashboard — v1 纯 CLI
-- 多仓库全局图 — v1 聚焦单仓
-- 向量搜索 / 嵌入 — 确定性路由优于概率搜索
-- MCP Server — CLI + JSON 更通用
-- 实时代码监控 — 增量基于 git diff 而非文件系统 watcher
+**Defer (v2+):**
+- CGo 分析（复杂度过高）
+- 泛型约束深度分析
+- 跨语言类型引用关联（protobuf/OpenAPI 桥接）
+- LLM 生成自由文本总结（违反 A4 公理）
+- 完整 UML 图生成
+- Web UI（v1 不做）
 
 ### Architecture Approach
 
 详见 [ARCHITECTURE.md](./ARCHITECTURE.md)。
 
-架构采用**控制面/数据面分离 + Trait 驱动语言适配器 + 流水线模式**。参考项目 codegraph 验证了相同技术组合的可行性。
+现有流水线 `scan → parse → mirror → index → diff/gate` 设计良好，四个新特性均能干净融入。关键架构决策：
 
-**主要组件（Cargo workspace crates）：**
-1. **anrsm-core** — 核心类型、LanguageAdapter trait、语义模型定义、配置结构
-2. **anrsm-scope** — Scope Manager（受管文件枚举）+ Repo Scanner（Git 集成）
-3. **anrsm-adapters** — 语言适配器集合（TS 适配器 + 正则回退），编译时注册，不使用动态加载
-4. **anrsm-fingerprint** — 双指纹引擎（source_fingerprint + semantic_fingerprint）
-5. **anrsm-mirror** — 文件镜像 + 模块镜像生成器（模板驱动）
-6. **anrsm-index** — 路由/符号/依赖索引构建
-7. **anrsm-drift** — 漂移分析（C0-C3 分级）+ 漂移报告
-8. **anrsm-cli** — 二进制入口，纯命令路由和输出格式化
+1. **Python & Go 适配器** — 纯增量，扩展 `wtcd-adapters` crate（单 crate 多模块），每个语言一个 `py.rs`/`go.rs` 文件实现 `LanguageAdapter` trait
+2. **模块级聚合** — 文件镜像与路由索引之间的新中间层，新增 `ModuleResult` 类型、`group_by_module_id()` 和 `aggregate_module()` 函数
+3. **知识层** — `wtcd-mirror::knowledge` 模块，三阶段流水线：Collect（读取模块镜像+索引）→ Analyze（依赖图、风险聚合）→ Generate（结构化文档）
 
-**关键架构模式：**
-- Trait-Based Adapter：编译时类型安全，无 ABI 风险，v1 不做动态加载
-- Pipeline Architecture：全量 init 流 + 增量 update 流，各阶段可独立测试
-- Semantic Fingerprinting：双指纹区分格式化改动 vs 语义改动
+**输出目录结构：**
+```
+mirror/
+├── file/          # 已有 — 文件级镜像
+├── module/        # 新增 — 模块级镜像
+├── knowledge/     # 新增 — 知识层文档
+└── routing_index.json  # 增强（含模块条目）
+```
+
+**Major components:**
+1. `wtcd-adapters` — 新增 `PyAdapter` 和 `GoAdapter`，注册到 `register_all_adapters()`
+2. `wtcd-core::types` — 扩展 `ExportKind`（Module, Decorator, Method, Struct）、新增 `ModuleResult`
+3. `wtcd-mirror` — 新增模块镜像生成 + `knowledge` 子模块
+4. `wtcd-scope` — 扩展 `SUPPORTED_EXTENSIONS` 加入 `"py"`, `"pyi"`, `"go"`
+5. `wtcd-cli` — 流水线插入模块聚合和知识生成步骤
 
 ### Critical Pitfalls
 
-详见 [PITFALLS.md](./PITFALLS.md)。以下是最可能杀死项目的 5 个关键陷阱：
+详见 [PITFALLS.md](./PITFALLS.md)。v0.1.1 最关键的 5 个陷阱：
 
-1. **C1: 镜像沦为装饰 — Agent 行为未改变** — 路由索引无效或 Agent 工作流没有"先读镜像"步骤导致系统价值归零。预防：CLI 输出包含 `read_order` 字段，Agent 集成强制先读镜像，dogfood 阶段监控实际读取路径。
-2. **C2: 门禁误报过高导致团队绕过** — 语义指纹对格式过于敏感，C0 噪声阻塞开发者。预防：指纹 normalize whitespace，C0 不阻断门禁，初期 warn-only 模式至少 2 周，建立失败样本回归集。
-3. **C3: AST 解析的隐藏地雷** — tree-sitter 增量解析可能产生不稳定结果（ERROR 节点、无限循环、GLR 丢弃正确分支）。预防：指纹基于全量解析结果，建立 golden test suite，解析超时机制，失败文件显式输出 low confidence。
-4. **C4: 指纹跨版本/跨环境不稳定** — 工具升级后大面积假漂移。预防：指纹包含 `fp_version` 版本号，normalize 行尾符/编码，提供 `anrsm migrate` 命令。
-5. **C5: 镜像变成第二真相源** — 团队先改镜像再改代码。预防：门禁阻断"只改镜像不改源码"的提交，知识层必须从镜像编译。
+1. **tree-sitter 版本锁冲突 (EXT-C1)** — 多语法库编译时产生链接器符号碰撞。**预防：** 所有 tree-sitter crate 锁定相同 minor 版本，CI 编译集成测试
+2. **Python 缩进解析边缘情况 (EXT-C2)** — Python 外部 C scanner 在混合 tab/space、dedent 错误恢复时产生异常。**预防：** 用 Django/Flask/FastAPI 等真实仓库测试，ERROR 节点优雅降级为 `confidence: low`
+3. **Go 包语义不匹配 (EXT-C3)** — Go 的 package 声明、`internal/` 可见性、首字母大小写导出与 TS/Python 模式完全不同。**预防：** 先解析 go.mod，按 package 声明分组（非目录），过滤导出
+4. **知识层生成泛化无用内容 (EXT-C5)** — 只有语法结构没有语义意图，生成的文档"比没有更糟"。**预防：** 只生成可验证事实（exports、dependencies、structure），绝不生成 "why"
+5. **镜像成为第二真相源 (C5)** — 工程师先改镜像再改代码。**预防：** 每个镜像必须有 `source_artifacts` 字段，门禁阻断"只改镜像不改源码"的提交
 
 ## Implications for Roadmap
 
-基于四份研究文件的交叉验证，建议 6 个阶段，与 ARCHITECTURE.md 的 Build Order 高度一致：
+Based on research, suggested phase structure:
 
-### Phase 1: Foundation（核心类型 + 解析基础）
-**Rationale:** 所有下游组件依赖核心类型。必须先冻结类型系统再做任何实现。这也是 Pitfall M2（无结构化提取）的预防节点——确保两段式流水线的结构化提取基础到位。
-**Delivers:** anrsm-core crate（类型、trait、配置）+ anrsm-adapters（TS 适配器原型）
-**Addresses:** 基线特性中的 AST 解析、配置文件驱动
-**Avoids:** C3 AST 解析地雷（在此阶段建立 golden test suite）、M2 无结构化提取、m2 适配器过度工程化
-**Uses:** clap 4.6, tree-sitter 0.26, serde, yaml_serde 0.10
+### Phase 1: Python Language Adapter
+**Rationale:** Python 适配器与 Go 适配器完全独立，可并行开发。Python 社区更大，tree-sitter-python 下载量更高（5.2M vs 3.8M），作为先行验证 tree-sitter 多语法集成模式。同时验证 EXT-C1（版本锁冲突）的预防策略。
+**Delivers:** `PyAdapter` 实现 `LanguageAdapter` trait，Python 文件解析产出 `FileResult`，扩展 `ExportKind` 和 `SUPPORTED_EXTENSIONS`
+**Addresses:** FEATURES.md §1 Python 适配器（所有 table stakes）
+**Avoids:** EXT-C1（建立版本锁定模式）、EXT-C2（处理缩进边缘情况）、PITFALLS m2（避免适配器过度工程化）
+**Risk:** MEDIUM — Python 装饰器包裹定义（`decorated_definition`）需要额外处理
 
-### Phase 2: Scoping + Parsing Pipeline（范围 + 解析流水线）
-**Rationale:** 验证从配置到解析结果的完整链路。Scope Manager 是性能的第一道防线（Pitfall C6/M3）。
-**Delivers:** anrsm-scope（Scope Manager + Repo Scanner）+ Semantic Extractor（最小版本）
-**Addresses:** 符号提取、依赖图、增量更新基础
-**Avoids:** C6 全量重建杀死性能（增量从 M1 默认）、M3 等强度镜像（Scope 优先级分层）
-**Uses:** gix 0.80, ignore 0.4
+### Phase 2: Go Language Adapter
+**Rationale:** 与 Phase 1 并行或紧随其后，复用 Phase 1 建立的 tree-sitter 集成模式。Go 适配器的独特挑战在于包语义（EXT-C3），需要独立验证。
+**Delivers:** `GoAdapter` 实现 `LanguageAdapter` trait，Go 文件解析产出 `FileResult`，Go 特殊处理（首字母大写导出、init() 标记、method vs function）
+**Addresses:** FEATURES.md §2 Go 适配器（所有 table stakes）
+**Avoids:** EXT-C3（Go 包语义正确处理）、EXT-M1（cgo 构建验证）、PITFALLS m2
+**Risk:** MEDIUM — `method_declaration` vs `function_declaration` 的 receiver 提取需要验证
 
-### Phase 3: Mirror Generation + Fingerprint（镜像生成 + 指纹）
-**Rationale:** 这是用户/Agent 看到的第一个有形产出。指纹是漂移检测的前提。
-**Delivers:** Fingerprint Engine（双指纹）+ Mirror Generator（文件 + 模块）+ `anrsm init` / `anrsm build`
-**Addresses:** 语义镜像持久化层、文件级镜像生成、机器可读文档头
-**Avoids:** C2 门禁误报（指纹 normalize）、C4 指纹不稳定（fp_version 协议）、M1 空话镜像（严格模板 schema）
-**Uses:** sha2 0.10, pulldown-cmark 0.13, tempfile 3
-**Research flag:** 语义指纹算法的具体设计需要深入研究（C1 vs C2 阈值如何定？）
+### Phase 3: Module-Level Mirror Aggregation
+**Rationale:** 依赖 Phase 1+2 完成（需要多语言 FileResults 验证聚合逻辑）。这是架构上最大的新增层，需要新类型、新模板、新流水线步骤。
+**Delivers:** `ModuleResult` 类型、`group_by_module_id()`/`aggregate_module()` 聚合逻辑、`ModuleMirrorHeader`/Body、`mirror/module/*.md` 输出、增强 routing_index
+**Addresses:** FEATURES.md §3 模块级聚合（所有 table stakes + 模块内依赖图、模块级指纹等 differentiators）
+**Avoids:** EXT-C4（模块定义歧义 — 需要 per-adapter boundary function）、EXT-M4（聚合大小爆炸 — 硬限制 2-3KB）、PITFALLS C6（增量更新）
+**Risk:** HIGH — 模块边界定义（Python 包 vs Go package vs TS 目录）有歧义，需要设计决策
 
-### Phase 4: Drift + Gate（漂移检测 + CI 门禁）
-**Rationale:** 需要先有基线镜像和指纹才能检测漂移。门禁是价值闭环的关键——没有门禁，镜像就是过时的文档。
-**Delivers:** Drift Analyzer（C0-C3 分级）+ Policy Gate + `anrsm update` / `anrsm check`
-**Addresses:** 语义指纹 + 漂移检测、Material Change 分类、CI/CD 集成
-**Avoids:** C2 门禁误报（warn-only 初期模式）、C5 第二真相源（门禁阻断镜像无源码变更）、A2 额外负担
-**Uses:** colored 2（人类友好输出）、tracing（诊断日志）
-**Research flag:** 需要实际测试仓库验证 C0/C1/C2 分类边界
-
-### Phase 5: Index + Query（索引 + Agent 查询）
-**Rationale:** 索引是镜像的派生物，依赖镜像存在。Agent 集成是价值闭环的验证点。
-**Delivers:** Index Builder（路由/符号/依赖）+ `anrsm query`（Agent 读取接口）
-**Addresses:** 路由索引、Agent 读取顺序契约、压缩效率指标
-**Avoids:** C1 镜像沦为装饰（强制读取顺序）、M5 忽略展开源码（`expand_condition` 字段）
-**Research flag:** Agent 实际使用 ANRSM 的行为数据验证（是否真的改变了读取顺序？）
-
-### Phase 6: Knowledge + Polish（知识层 + 打磨）
-**Rationale:** 知识层是最高层级的派生，依赖所有下层。推迟到此阶段避免 Pitfall M4（知识层提前平台化）。
-**Delivers:** Knowledge Compiler + 更多语言适配器 + CLI 输出优化 + JSON Schema 稳定化
-**Addresses:** 人类知识层编译、多语言适配器扩展
-**Avoids:** M4 知识层提前平台化（严格阶段顺序保证）
-**Research flag:** 第二个试点仓库验证（Pitfall m5: dogfood 仓库太特殊）
+### Phase 4: Knowledge Layer
+**Rationale:** 最后构建，依赖 Phase 3 的模块镜像和增强路由索引。知识层是纯派生品，风险在于内容质量而非技术实现。
+**Delivers:** `wtcd-mirror::knowledge` 模块、`KnowledgeHeader` 类型、`mirror/knowledge/*.md` 输出（architecture.md、api-surface.md、risk-map.md）、`anrsm.yaml` 扩展 `knowledge:` 配置块
+**Addresses:** FEATURES.md §4 知识层（所有 table stakes）
+**Avoids:** EXT-C5（只生成可验证事实）、PITFALLS M4（不提前平台化）、PITFALLS C5（知识层从镜像编译，不允许独立事实）
+**Risk:** MEDIUM — 输出格式和内容深度需要与实际 Agent 消费需求对齐
 
 ### Phase Ordering Rationale
 
-- **依赖驱动：** AST 解析 → 符号提取 → 语义指纹 → 漂移检测 → 门禁 → 索引 → Agent 查询 → 知识层。这是 FEATURES.md 中明确的关键路径。
-- **风险递增：** Phase 1-3 处理技术风险（解析稳定性、指纹算法），Phase 4-5 处理产品风险（门禁误报率、Agent 行为改变），Phase 6 处理扩展风险。
-- **价值递进：** Phase 3 结束时已有可运行的镜像生成，Phase 4 结束时已有 CI 集成，Phase 5 结束时 Agent 可直接使用。
-- **Pitfall 防御：** 每个阶段的前置条件都对应了关键陷阱的预防窗口——例如指纹版本化协议必须在 Phase 3 冻结（C4），门禁必须先 warn-only（C2）。
+- **适配器先行（Phase 1-2 并行）：** 产出 FileResult 供所有后续消费，无下游依赖，纯增量
+- **模块聚合其次（Phase 3）：** 依赖多语言 FileResults 验证，是知识层的硬依赖
+- **知识层最后（Phase 4）：** 纯派生品，依赖模块镜像 + 增强路由索引，提前做会产生"泛化无用内容"陷阱
+- **此顺序遵循 PITFALLS M4 的警告：** 严格遵循阶段顺序，先适配器 → 镜像 → 聚合 → 知识
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
-- **Phase 3:** 语义指纹算法的具体设计（C1 vs C2 阈值、归一化规则）— 需要对真实 TS/JS 仓库做 PoC
-- **Phase 4:** C0/C1/C2 分类边界的实际验证 — 需要真实 diff 数据集
-- **Phase 5:** Agent 行为变更验证 — 需要实际使用数据，当前是推断性的
+- **Phase 3 (Module Aggregation):** 模块边界定义策略需要设计决策 — Python `__init__.py` vs Go `package` vs TS 目录的统一方案。需要 ADR。
+- **Phase 4 (Knowledge Layer):** 输出内容深度和格式需要与 Agent 实际消费需求对齐。可能需要 `/gsd-research-phase` 验证最佳实践。
 
-Phases with standard patterns（skip research-phase）:
-- **Phase 1:** 核心类型定义 + CLI 框架 — 标准 Rust workspace 实践，clap derive API 文档完善
-- **Phase 2:** 文件遍历 + Git 集成 — ignore crate + gix API 文档成熟
+Phases with standard patterns (skip research-phase):
+- **Phase 1 (Python Adapter):** tree-sitter-python 成熟，TS 适配器可作模板，模式明确
+- **Phase 2 (Go Adapter):** tree-sitter-go 成熟，同上
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | 基于 Context7 官方文档 + crates.io 版本验证 + 多源交叉验证。tree-sitter/gix/clap 选型有明确的技术论据和竞品参考 |
-| Features | HIGH | 竞品功能基于 2026 年多来源交叉验证。差异化判断有设计文档直接支撑。MVP 分阶段建议务实 |
-| Architecture | HIGH | 控制面/数据面分离 + Trait Adapter + Pipeline 是 Rust 社区标准实践。参考项目 codegraph/NekoCode 验证了相同技术组合。组件边界清晰 |
-| Pitfalls | HIGH | 内部反模式文档 + 外部失败模式研究高度一致。6 个 Critical Pitfall 有明确的预警信号和预防策略 |
+| Stack | HIGH | tree-sitter 版本兼容性已验证（tree-sitter-language 桥接 + 项目已有 TS 适配器），所有依赖在 crates.io 可用且下载量验证 |
+| Features | HIGH | Python/Go 的 AST 节点类型从 node-types.json 验证，tree-sitter 生态成熟，映射表完整 |
+| Architecture | HIGH | 现有流水线设计良好，trait-based 扩展模式清晰，集成点明确，无架构重构需求 |
+| Pitfalls | HIGH | 项目自身反模式文档 + 外部研究（tree-sitter issues、DevTool 采用率、CI 门禁模式）高度一致 |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **AST 提取效果验证：** 需要对真实 TS/JS 仓库做 PoC，验证 tree-sitter CST 提取能否满足精确的类型签名/泛型信息需求。若不足，需要切换到 SWC（已在 STACK.md 中规划）。
-- **语义指纹算法设计：** C0/C1/C2/C3 的阈值和归一化规则需要实际数据支撑，当前是推断性的。Phase 3 需要深入研究。
-- **Agent 行为变更数据：** "读取顺序契约"是否真的改变 Agent 行为没有实证数据。Phase 5 需要 dogfooding 验证。
-- **压缩效率基准：** 镜像 vs 源码的 Token 比例在真实场景中是多少？当前没有量化数据。
-- **MSRV 统一：** clap 4.6 MSRV 1.85, jsonschema 0.45 MSRV 1.83, gix 0.80 MSRV 1.82。需要在 Phase 1 统一解决。
+- **模块边界配置 vs 自动发现：** Python `__init__.py` 是自然边界，Go `package` 声明是自然边界，但 TS/JS 的目录约定需要设计决策。**处理方式：** Phase 3 开始时写 ADR，建议"自动发现 + anrsm.yaml 可选覆盖"
+- **模块镜像指纹计算：** 聚合文件指纹 vs 重新计算语义指纹。**处理方式：** 建议聚合（`hash(sorted(child_fingerprints))`），确定性好
+- **知识层是否需要独立指纹：** 完全由下层派生，建议 v0.1.1 不做独立指纹
+- **Python `__all__` 语义：** 有 `__all__` 时只提取列表中的符号，无则全量导出。**处理方式：** Phase 1 实现时验证
+- **Cross-language type reference gap:** 单仓 TS+Python+Go 中跨语言类型引用（protobuf/OpenAPI）当前无法关联。**处理方式：** v0.1.1 不解决，v2 评估
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Context7: `/websites/rs_clap` — clap 4.x derive API, features
-- Context7: `/websites/rs_tree-sitter` — tree-sitter Rust bindings, parser usage
-- Context7: `/websites/rs_gix` — gix API, feature flags, git2 migration guide
-- crates.io 直接版本验证：yaml_serde 0.10, gix 0.80, sha2 0.10, jsonschema 0.45, tree-sitter 0.26, tree-sitter-typescript 0.23
-- 项目规范文档：04_Architecture_and_Component_Model.md, 05_Information_Model_and_Repository_Layout.md, 07_Drift_Detection_Synchronization_and_CI.md, 11_AntiPatterns_FailureModes_and_Decision_Record_Guide.md
+- crates.io: `tree-sitter-python` 0.25.0, `tree-sitter-go` 0.25.0, `tree-sitter-md` 0.5.3, `tree-sitter` 0.26.7 — 版本、依赖、下载量
+- Context7: `/tree-sitter/tree-sitter-python`, `/tree-sitter/tree-sitter-go` — AST 节点类型、语法结构
+- GitHub: tree-sitter/tree-sitter#3069 — tree-sitter-language crate 架构
+- GitHub: tree-sitter/tree-sitter-python/node-types.json — Python 完整节点类型
+- GitHub: tree-sitter/tree-sitter-go/test/corpus — Go AST 结构示例
+- 现有代码库: `wtcd-core::adapter`, `wtcd-adapters::ts`, `wtcd-mirror::template`, `wtcd-cli::commands::run`
 
 ### Secondary (MEDIUM confidence)
-- [codegraph](https://github.com/optave/codegraph) — Rust + Tree-sitter 多语言代码分析参考实现
-- [NekoCode](https://github.com/moe-charm/nekocode-rust) — Rust + Tree-sitter 多语言分析
-- [ZeroClaw trait-driven architecture](https://zeroclaws.io/blog/trait-driven-architecture-extensible-agents/) — 编译时 trait 方案 vs 动态插件安全对比
-- WebSearch: "gix vs git2 2025", "SWC vs tree-sitter", "Oxc vs SWC 2026"
-- GitHub: nushell/nushell#14985 (serde_yml removal), tree-sitter issues #4001, #322, #3243
-- CocoIndex Code, Swimm Deep Index — 竞品功能验证
+- tree-sitter issues: #4209（链接器符号冲突）、#5421（Go binding include path）、#4001（增量解析不一致）、#322（解析器无限循环）
+- DevTools 采用率研究 — 95% 放弃率，time-to-first-value 关键
+- AI Documentation Debt — 泛化内容、stale-on-arrival 模式
+- CI 门禁失败模式 — 误报导致绕过
+- AutomaDocs / Context+ MCP / Knowledge as Code — 架构参考模式
 
 ### Tertiary (LOW confidence)
-- Agent 行为改变的推断性判断 — 没有实证数据，需要 Phase 5 验证
-- 压缩效率的量化 — 当前是理论推算，需要真实场景基准测试
+- WebSearch: "tree-sitter 0.26 compatible tree-sitter-python 0.25" — ABI 兼容性验证
+- Cross-language type reference gap — v2 问题，当前无成熟方案
 
 ---
+
 *Research completed: 2026-03-21*
 *Ready for roadmap: yes*
