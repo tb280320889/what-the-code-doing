@@ -6,6 +6,7 @@ members = [
     "crates/wtcd-cli",
     "crates/wtcd-tests",
     "crates/wtcd-mirror",
+    "crates/wtcd-diff",
 ]
 resolver = "2"
 
@@ -19,6 +20,7 @@ wtcd-core = { path = "crates/wtcd-core" }
 wtcd-scope = { path = "crates/wtcd-scope" }
 wtcd-adapters = { path = "crates/wtcd-adapters" }
 wtcd-mirror = { path = "crates/wtcd-mirror" }
+wtcd-diff = { path = "crates/wtcd-diff" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 yaml_serde = "0.10"
@@ -31,7 +33,7 @@ tree-sitter = "0.26"
 tree-sitter-typescript = "0.23"
 tree-sitter-javascript = "0.23"
 globset = "0.4"
-gix = { version = "0.72", features = ["max-performance-safe"] }
+gix = { version = "0.63", features = ["max-performance-safe"] }
 uuid = { version = "1", features = ["v4"] }
 tempfile = "3"
 
