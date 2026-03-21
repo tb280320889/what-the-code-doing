@@ -27,6 +27,14 @@ enum Commands {
     },
     /// Check for drift between source and mirrors
     Check {},
+    /// Route a task description to candidate files
+    Route {
+        /// Natural language task description
+        query: String,
+        /// Maximum number of results to return
+        #[arg(long, default_value = "10")]
+        top_k: usize,
+    },
 }
 
 fn main() {
@@ -35,6 +43,7 @@ fn main() {
         Commands::Init {} => commands::init::run_init(&cli.root),
         Commands::Run { full } => commands::run::run_analysis(&cli.root, full),
         Commands::Check {} => commands::check::run_check(&cli.root),
+        Commands::Route { query, top_k } => commands::route::run_route(&cli.root, &query, top_k),
     };
 
     if let Err(e) = result {
