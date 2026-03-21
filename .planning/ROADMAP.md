@@ -29,7 +29,14 @@
   4. User can run `anrsm run` to parse all scoped TS/JS files and see exported symbols, function signatures, dependency edges, and detected side effects
   5. Parser gracefully degrades on broken files — output includes `confidence: low` instead of crashing
   6. All CLI output is JSON-structured and machine-parseable
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Cargo workspace + wtcd-core 核心类型定义
+- [ ] 01-02-PLAN.md — wtcd-scope 配置解析 + 文件扫描
+- [ ] 01-03-PLAN.md — wtcd-adapters TS/JS tree-sitter 解析适配器
+- [ ] 01-04-PLAN.md — wtcd-cli init/run 命令 + JSON 输出
+- [ ] 01-05-PLAN.md — Golden test fixtures + 集成测试
 
 ### Phase 2: Mirror + Fingerprint
 **Goal**: Parsed semantic facts are rendered as version-controllable mirror files with dual fingerprints distinguishing content changes from semantic changes
@@ -74,7 +81,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/13 | Not started | - |
+| 1. Foundation | 0/5 | Planned | - |
 | 2. Mirror + Fingerprint | 0/8 | Not started | - |
 | 3. Drift + Gate | 0/12 | Not started | - |
 | 4. Index + Route | 0/5 | Not started | - |
