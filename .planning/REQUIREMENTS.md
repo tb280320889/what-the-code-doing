@@ -24,12 +24,12 @@ Requirements for initial release (M0-M3). Each maps to roadmap phases.
 
 ### Language Adapter (TypeScript/JS)
 
-- [ ] **LANG-01**: 使用 tree-sitter 解析 TypeScript 和 JavaScript 文件
-- [ ] **LANG-02**: 提取导出符号（函数、类、类型、常量）
-- [ ] **LANG-03**: 提取依赖边（import/require 语句）
-- [ ] **LANG-04**: 提取函数签名和参数类型
-- [ ] **LANG-05**: 识别副作用（I/O、网络、存储、日志调用）
-- [ ] **LANG-06**: 对解析失败的文件标记低置信度并优雅降级
+- [x] **LANG-01**: 使用 tree-sitter 解析 TypeScript 和 JavaScript 文件
+- [x] **LANG-02**: 提取导出符号（函数、类、类型、常量）
+- [x] **LANG-03**: 提取依赖边（import/require 语句）
+- [x] **LANG-04**: 提取函数签名和参数类型
+- [x] **LANG-05**: 识别副作用（I/O、网络、存储、日志调用）
+- [x] **LANG-06**: 对解析失败的文件标记低置信度并优雅降级
 
 ### Mirror Generator
 
@@ -125,12 +125,12 @@ Deferred to future release. Tracked but not in current roadmap.
 | SCOP-01 | Phase 1: Foundation | ✅ Complete (01-02) |
 | SCOP-02 | Phase 1: Foundation | ✅ Complete (01-02) |
 | SCOP-03 | Phase 1: Foundation | ✅ Complete (01-02) |
-| LANG-01 | Phase 1: Foundation | Pending |
-| LANG-02 | Phase 1: Foundation | Pending |
-| LANG-03 | Phase 1: Foundation | Pending |
-| LANG-04 | Phase 1: Foundation | Pending |
-| LANG-05 | Phase 1: Foundation | Pending |
-| LANG-06 | Phase 1: Foundation | Pending |
+| LANG-01 | Phase 1: Foundation | Complete |
+| LANG-02 | Phase 1: Foundation | Complete |
+| LANG-03 | Phase 1: Foundation | Complete |
+| LANG-04 | Phase 1: Foundation | Complete |
+| LANG-05 | Phase 1: Foundation | Complete |
+| LANG-06 | Phase 1: Foundation | Complete |
 | MIRR-01 | Phase 2: Mirror + Fingerprint | Pending |
 | MIRR-02 | Phase 2: Mirror + Fingerprint | Pending |
 | MIRR-03 | Phase 2: Mirror + Fingerprint | Pending |

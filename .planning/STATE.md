@@ -3,19 +3,19 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-21T03:16:00.000Z"
+last_updated: "2026-03-21T03:30:23.954Z"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
+  completed_plans: 3
 ---
 
 # STATE.md — WTCD Project Memory
 
 **Last updated:** 2026-03-21
 **Phase:** 1 (Foundation)
-**Plan:** 2 of 5 complete
+**Plan:** 3 of 5 complete
 **Status:** Executing Phase 01
 
 ---
@@ -31,7 +31,7 @@ progress:
 ## Current Position
 
 Phase: 01 (foundation) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 
 ## Performance Metrics
 
@@ -43,6 +43,7 @@ Plan: 2 of 5
 | Pitfalls Identified | 6 Critical + 8 Moderate | Mitigations embedded in roadmap |
 
 ---
+| Phase 01-foundation P03 | 9min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -62,13 +63,14 @@ Plan: 2 of 5
 | Phase 1 四 crate workspace | Locked — wtcd-core, wtcd-scope, wtcd-adapters, wtcd-cli |
 | Warn-only gate initially | Required — C2 pitfall prevention |
 | Incremental as default path | Required — C6 pitfall prevention |
+| tree-sitter positional children traversal for unnamed nodes | Locked — children().find(c.kind()) for import_clause, formal_parameters, variable identifiers |
 
 ### Active Todos
 
 - [x] Phase 1 context: capture implementation decisions (01-CONTEXT.md)
 - [x] Phase 1 plan: decompose Foundation into executable plans
 - [x] wtcd-scope: config loading + file scanning (Plan 02)
-- [ ] Golden test suite setup for tree-sitter TS/JS parsing
+- [x] TDD tests for tree-sitter TS/JS parsing (Plan 03)
 - [ ] MSRV unification (clap 4.5 vs 4.6, jsonschema version)
 - [ ] 更新 PROJECT.md/ROADMAP.md/REQUIREMENTS.md 中的项目名 ANRSM → WTCD
 
@@ -97,4 +99,4 @@ None currently.
 ---
 
 *Created: 2026-03-21 after roadmap initialization*
-*Last session: 2026-03-21 — Completed 01-02-PLAN.md (wtcd-scope)*
+*Last session: 2026-03-21 — Completed 01-03-PLAN.md (TDD TS/JS adapter tests + bug fixes)*
