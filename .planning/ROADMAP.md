@@ -68,7 +68,15 @@ Plans:
   4. Gate policy is configurable in `anrsm.yaml` — initially defaults to warn-only mode to avoid adoption-killing false positives
   5. Gate returns standard exit codes (0 pass, 1 fail) with ANRSM-001 to ANRSM-010 failure codes for CI pipeline integration
   6. `anrsm run` defaults to incremental mode — only re-parses changed files and their neighbors via git diff; `--full` flag triggers full rebuild
-**Plans**: TBD
+**Plans**: 6 plans in 4 waves
+
+Plans:
+- [ ] 03-01-PLAN.md — GateConfig + drift types in wtcd-core (Wave 1)
+- [ ] 03-02-PLAN.md — Git diff with gix: wtcd-diff crate scaffold + working tree vs HEAD (Wave 2)
+- [ ] 03-03-PLAN.md — Reverse dependency graph from FileResult imports (Wave 2)
+- [ ] 03-04-PLAN.md — Drift classifier: C0/C1/C2/C3 + affected neighbor expansion (Wave 3)
+- [ ] 03-05-PLAN.md — Gate policy evaluator with fail_on/warn_on rules (Wave 3)
+- [ ] 03-06-PLAN.md — CLI integration: anrsm check + incremental run + --full flag (Wave 4)
 
 ### Phase 4: Index + Route
 **Goal**: Agents and developers can query the mirror system with natural language tasks and get ranked candidate modules/files with freshness signals
@@ -90,7 +98,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/5 | In Progress | - |
 | 2. Mirror + Fingerprint | 0/5 | Not started | - |
-| 3. Drift + Gate | 0/12 | Not started | - |
+| 3. Drift + Gate | 0/6 | Not started | - |
 | 4. Index + Route | 0/5 | Not started | - |
 
 ---
