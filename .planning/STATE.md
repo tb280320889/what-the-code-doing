@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: complete
-last_updated: "2026-03-21T18:00:00.000Z"
+status: shipped
+last_updated: "2026-03-21T18:30:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 5
@@ -16,7 +16,7 @@ progress:
 **Last updated:** 2026-03-21
 **Phase:** ALL COMPLETE
 **Plan:** ALL COMPLETE
-**Status:** ✅ MILESTONE v1.0 COMPLETE — 5 phases, 22 plans, 160 tests, 8 crates
+**Status:** ✅ MILESTONE v1.0 SHIPPED — 5 phases, 22 plans, 160 tests, 8 crates, pushed to origin/main
 
 ---
 
@@ -24,7 +24,7 @@ progress:
 
 **Core Value:** 让 AI Agent 的默认读取行为从"吞源码"变为"先读镜像"，用最小充分上下文完成工程决策。
 
-**Current Focus:** Milestone v1.0 complete — ready for v2 planning or release
+**Current Focus:** Milestone v1.0 shipped — pushed to origin/main, ready for v2 planning
 
 ---
 
@@ -36,7 +36,7 @@ Phase: 03 (drift + gate) — COMPLETE (6 plans, 22 new tests, 128 total)
 Phase: 04 (index + route) — COMPLETE (3 plans, 32 new tests, 160 total)
 Phase: 999.1 (MCP Server) — COMPLETE (3 plans, 12 files, MCP E2E verified)
 
-**MILESTONE v1.0 COMPLETE** — 8 crates, 160 tests, 0 build errors
+**MILESTONE v1.0 SHIPPED** — 8 crates, 160 tests, 0 build errors, pushed to origin/main
 Audit: .planning/v1.0-MILESTONE-AUDIT.md (status: passed, 38/38 requirements)
 
 ## Performance Metrics
@@ -175,4 +175,4 @@ None currently.
 ---
 
 *Created: 2026-03-21 after roadmap initialization*
-*Last session: 2026-03-21 — Completed Phase 999.1 (MCP Server) — 3 plans, wtcd-mcp crate, CLI integration, E2E verified, Rust 1.92*
+*Last session: 2026-03-21 — Shipped Milestone v1.0 — pushed 38 commits to origin/main*
