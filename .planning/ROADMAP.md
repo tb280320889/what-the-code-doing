@@ -160,14 +160,16 @@ Plans:
 
 ## Backlog
 
-### Phase 999.1: 还是要做成MCP, MCP 比 cli 更有优势, 会自动加载到 agent的上下文中,看看如何开发 (BACKLOG)
+### Phase 999.1: MCP Server — 将 WTCD 核心能力通过 MCP 协议暴露给 Agent
 
-**Goal:** [Captured for future planning]
-**Requirements:** TBD
-**Plans:** 0 plans
+**Goal:** Agent 可以通过 MCP 协议自动发现并使用 WTCD 的解析和扫描能力，无需手动调用 CLI
+**Requirements:** N/A (backlog phase, not mapped to v1 requirements)
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD (promote with /gsd-review-backlog when ready)
+- [ ] 999.1-01-PLAN.md — wtcd-mcp crate scaffold + MCP Server 核心（4 个 MCP Tool）
+- [ ] 999.1-02-PLAN.md — CLI 集成：`wtcd mcp` + `wtcd mcp-install` 子命令
+- [ ] 999.1-03-PLAN.md — 端到端验证 + MCP 规范文档
 
 ---
 
