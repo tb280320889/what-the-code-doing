@@ -1,0 +1,11 @@
+[package]
+name = "wtcd-tests"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dev-dependencies]
+wtcd-core = { workspace = true }
+wtcd-adapters = { workspace = true }
+serde_json = { workspace = true }
+yaml_serde = { workspace = true }
