@@ -1,22 +1,22 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.1.1
-milestone_name: multi-language-and-knowledge
-status: milestone_v0.1.1_completed
+milestone: v0.2.0
+milestone_name: polyglot-adapters
+status: defining_requirements
 last_updated: "2026-03-22T00:00:00Z"
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 5
-  completed_plans: 5
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # STATE.md — WTCD Project Memory
 
 **Last updated:** 2026-03-22
-**Phase:** 8 of 8 (Knowledge Layer)
-**Plan:** 05-01/05-02, 06-01, 07-01, 08-01
-**Status:** ✅ MILESTONE v0.1.1 COMPLETE
+**Phase:** Not started (defining requirements)
+**Plan:** -
+**Status:** ◆ Defining requirements for milestone v0.2.0
 
 ---
 
@@ -24,24 +24,20 @@ progress:
 
 **Core Value:** 让 AI Agent 的默认读取行为从"吞源码"变为"先读镜像"，用最小充分上下文完成工程决策。
 
-**Current Focus:** Milestone v0.1.1 — Multi-Language & Knowledge Layer (Phases 5–8)
+**Current Focus:** Milestone v0.2.0 — Polyglot Adapters (Rust/Dart/Java/Kotlin/Swift/C++/C#/C/Zig)
 
 ---
 
 ## Current Position
 
-**Previous Milestone:** v1.0 — 5 phases, 22 plans, 160 tests, 8 crates, pushed to origin/main
-Audit: .planning/v1.0-MILESTONE-AUDIT.md (status: passed, 38/38 requirements)
+**Previous Milestones:**
+- v1.0 — 5 phases, 22 plans, 160 tests, 8 crates
+- v0.1.1 — 4 phases, 40 requirements (fully complete)
 
-**This Milestone:** v0.1.1 — 4 phases, 40 requirements
-| Phase | Goal | Requirements |
-|-------|------|--------------|
-| 5. Python Adapter | Python tree-sitter 适配器 | PY-01 ~ PY-09 (9) |
-| 6. Go Adapter | Go tree-sitter 适配器 | GO-01 ~ GO-12 (12) |
-| 7. Module Aggregation | 模块级镜像聚合 | MOD-01 ~ MOD-10 (10) |
-| 8. Knowledge Layer | 知识层文档生成 | KNOW-01 ~ KNOW-09 (9) |
+**Current Milestone:** v0.2.0 — Polyglot Adapters
+目标：新增 Rust、Dart、Java、Kotlin、Swift、C++、C#、C、Zig 9 种语言完整适配器。
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ---
 
@@ -60,17 +56,10 @@ Progress: [██████████] 100%
 
 ### Active Todos
 
-- [x] Define requirements for v0.1.1
-- [x] Research Python/Go tree-sitter integration
-- [x] Create roadmap for v0.1.1
-- [x] Plan Phase 5: Python Adapter
-- [x] Plan Phase 6: Go Adapter
-- [x] Execute Phase 6: Go Adapter
-- [x] Plan Phase 7: Module Aggregation
-- [x] Execute Phase 7: Module Aggregation
-- [x] Plan Phase 8: Knowledge Layer
-- [x] Execute Phase 8: Knowledge Layer
-- [x] Complete v0.1.1 lifecycle (audit/complete/cleanup)
+- [ ] Research language ecosystem for Rust/Dart/Java/Kotlin/Swift/C++/C#/C/Zig adapters
+- [ ] Define v0.2.0 scoped requirements and REQ IDs
+- [ ] Create v0.2.0 roadmap with continued phase numbering
+- [ ] Start first phase via /gsd-plan-phase [N]
 
 ### Blockers
 
@@ -97,4 +86,4 @@ None currently.
 ---
 
 *Created: 2026-03-21 after roadmap initialization*
-*Last session: 2026-03-22 — v0.1.1 fully completed (Phase 5-8 + lifecycle)*
+*Last session: 2026-03-22 — v0.2.0 milestone initialized (questioning complete)*
