@@ -2,21 +2,21 @@
 gsd_state_version: 1.0
 milestone: v0.2.0
 milestone_name: polyglot-adapters
-status: roadmap_defined
-last_updated: "2026-03-22T01:00:00Z"
+status: in_progress
+last_updated: "2026-03-22"
 progress:
   total_phases: 4
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
 ---
 
 # STATE.md — WTCD Project Memory
 
 **Last updated:** 2026-03-22
-**Phase:** Phase 9 (not started)
-**Plan:** 未创建（等待 `/gsd-plan-phase 9`）
-**Status:** ◆ Roadmap defined for milestone v0.2.0
+**Phase:** Phase 10 (up next)
+**Plan:** Phase 9 complete — 9 adapters verified, 207 tests pass
+**Status:** ◆ Autonomous execution in progress
 
 ---
 
@@ -43,7 +43,7 @@ progress:
 - Phase 11: Route & Knowledge Signal Quality
 - Phase 12: Stability Gates & Regression Reliability
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 25%
 
 ---
 
@@ -62,11 +62,11 @@ Progress: [░░░░░░░░░░] 0%
 
 ### Active Todos
 
-- [ ] Plan Phase 9 via `/gsd-plan-phase 9`
-- [ ] Execute Phase 9 plans (adapter coverage + scanner/registry routing)
-- [ ] Plan and execute Phase 10 (aggregation consistency)
-- [ ] Plan and execute Phase 11 (route/knowledge signal quality)
-- [ ] Plan and execute Phase 12 (stability gates + regression reliability)
+- [x] Plan Phase 9 — done
+- [x] Execute Phase 9 — 9 adapters verified, 207 tests pass
+- [ ] Discuss + Plan + Execute Phase 10 (aggregation consistency)
+- [ ] Discuss + Plan + Execute Phase 11 (route/knowledge signal quality)
+- [ ] Discuss + Plan + Execute Phase 12 (stability gates + regression reliability)
 
 ### Blockers
 

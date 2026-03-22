@@ -32,6 +32,16 @@ pub struct ExportedSymbol {
     pub name: String,
     pub kind: ExportKind,
     pub line: u32,
+    /// Whether this symbol is from generated/uncertain code
+    #[serde(default)]
+    pub is_generated: bool,
+    /// Per-symbol confidence band
+    #[serde(default = "default_high_confidence")]
+    pub confidence: ConfidenceBand,
+}
+
+fn default_high_confidence() -> ConfidenceBand {
+    ConfidenceBand::High
 }
 
 /// Import kind (D-17)
@@ -112,6 +122,9 @@ pub struct ModuleResult {
     pub fan_in: usize,
     pub fan_out: usize,
     pub drift_level: String,
+    /// Module-level confidence (min across all files)
+    #[serde(default = "default_high_confidence")]
+    pub confidence: ConfidenceBand,
 }
 
 /// Repository-level knowledge output (Phase 8)

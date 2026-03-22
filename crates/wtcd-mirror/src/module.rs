@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 use crate::fingerprint::compute_source_fingerprint;
-use wtcd_core::types::{ChangeClass, FileResult, ModuleResult};
+use wtcd_core::types::{ChangeClass, ConfidenceBand, FileResult, ModuleResult};
 
 fn detect_language(path: &str) -> &'static str {
     match std::path::Path::new(path)
@@ -13,6 +13,15 @@ fn detect_language(path: &str) -> &'static str {
         "go" => "go",
         "ts" | "tsx" => "typescript",
         "js" | "jsx" => "javascript",
+        "rs" => "rust",
+        "dart" => "dart",
+        "java" => "java",
+        "kt" | "kts" => "kotlin",
+        "swift" => "swift",
+        "c" | "h" => "c",
+        "cpp" | "cc" | "cxx" | "hpp" | "hh" | "hxx" => "cpp",
+        "cs" => "csharp",
+        "zig" => "zig",
         _ => "unknown",
     }
 }
@@ -81,6 +90,7 @@ pub fn aggregate_module(
     let mut file_paths = Vec::new();
     let mut languages = BTreeSet::new();
     let mut child_semantic = Vec::new();
+    let mut min_confidence = ConfidenceBand::High;
 
     for f in files {
         file_paths.push(f.file_path.clone());
@@ -98,6 +108,13 @@ pub fn aggregate_module(
             "{}:{:?}:{:?}:{:?}",
             f.file_path, f.exports, f.imports, f.signatures
         )));
+
+        // Confidence rollup: take the minimum
+        min_confidence = match (min_confidence, f.confidence) {
+            (ConfidenceBand::None, _) | (_, ConfidenceBand::None) => ConfidenceBand::None,
+            (ConfidenceBand::Low, _) | (_, ConfidenceBand::Low) => ConfidenceBand::Low,
+            _ => ConfidenceBand::High,
+        };
     }
 
     child_semantic.sort();
@@ -138,6 +155,7 @@ pub fn aggregate_module(
         fan_in,
         fan_out,
         drift_level,
+        confidence: min_confidence,
     }
 }
 
@@ -149,7 +167,14 @@ pub fn build_module_graph(modules: &[ModuleResult]) -> HashMap<String, HashSet<S
         let mut targets = HashSet::new();
         for dep in &m.dependencies {
             for other in &all_modules {
-                if dep.contains(other) && other != &m.module_id {
+                if other == &m.module_id {
+                    continue;
+                }
+                // Path prefix matching: dep starts with module_id or module_id is a prefix of dep
+                if dep.starts_with(other.as_str())
+                    || dep.starts_with(&format!("{}/", other))
+                    || dep == other
+                {
                     targets.insert(other.clone());
                 }
             }
@@ -200,6 +225,8 @@ mod tests {
                     name: (*e).to_string(),
                     kind: ExportKind::Function,
                     line: 1,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 })
                 .collect(),
             imports: deps

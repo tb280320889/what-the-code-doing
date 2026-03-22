@@ -237,6 +237,8 @@ mod tests {
                 name: "greet".to_string(),
                 kind: ExportKind::Function,
                 line: 1,
+                is_generated: false,
+                confidence: ConfidenceBand::High,
             }],
             imports: vec![],
             signatures: vec![],

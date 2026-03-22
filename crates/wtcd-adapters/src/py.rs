@@ -97,6 +97,8 @@ impl LanguageAdapter for PyAdapter {
                 name: "__package__".to_string(),
                 kind: ExportKind::Const,
                 line: 1,
+                is_generated: false,
+                confidence: ConfidenceBand::High,
             });
             side_effects.push(meta_line(
                 SideEffectKind::Log,
@@ -227,6 +229,8 @@ fn visit_node(
             name: name.clone(),
             kind: ExportKind::Function,
             line: node.start_position().row as u32 + 1,
+            is_generated: false,
+            confidence: ConfidenceBand::High,
         });
 
         let (parameters, return_type) = extract_py_signature(node, source);
@@ -276,6 +280,8 @@ fn visit_node(
             name,
             kind: ExportKind::Class,
             line: node.start_position().row as u32 + 1,
+            is_generated: false,
+            confidence: ConfidenceBand::High,
         });
 
         let bases = extract_class_bases(node, source);

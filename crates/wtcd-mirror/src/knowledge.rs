@@ -210,6 +210,7 @@ fn sanitize_node(n: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use wtcd_core::types::ConfidenceBand;
 
     fn m(id: &str, deps: &[&str], drift: &str) -> ModuleResult {
         ModuleResult {
@@ -224,6 +225,7 @@ mod tests {
             fan_in: 0,
             fan_out: deps.len(),
             drift_level: drift.to_string(),
+            confidence: ConfidenceBand::High,
         }
     }
 

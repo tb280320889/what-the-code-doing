@@ -387,11 +387,15 @@ mod tests {
                     name: "login".to_string(),
                     kind: ExportKind::Function,
                     line: 10,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 },
                 ExportedSymbol {
                     name: "logout".to_string(),
                     kind: ExportKind::Function,
                     line: 25,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 },
             ],
             imports: vec![

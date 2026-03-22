@@ -125,6 +125,8 @@ fn extract_exports(root: &Node, source: &str, out: &mut Vec<ExportedSymbol>) {
                                     .to_string(),
                                 kind: ExportKind::Function,
                                 line: node.start_position().row as u32 + 1,
+                                is_generated: false,
+                                confidence: ConfidenceBand::High,
                             });
                         }
                     }
@@ -137,6 +139,8 @@ fn extract_exports(root: &Node, source: &str, out: &mut Vec<ExportedSymbol>) {
                                     .to_string(),
                                 kind: ExportKind::Class,
                                 line: node.start_position().row as u32 + 1,
+                                is_generated: false,
+                                confidence: ConfidenceBand::High,
                             });
                         }
                     }
@@ -160,6 +164,8 @@ fn extract_exports(root: &Node, source: &str, out: &mut Vec<ExportedSymbol>) {
                                             .to_string(),
                                         kind,
                                         line: node.start_position().row as u32 + 1,
+                                        is_generated: false,
+                                        confidence: ConfidenceBand::High,
                                     });
                                 }
                             }
@@ -176,6 +182,8 @@ fn extract_exports(root: &Node, source: &str, out: &mut Vec<ExportedSymbol>) {
                                             .to_string(),
                                         kind: ExportKind::Var,
                                         line: node.start_position().row as u32 + 1,
+                                        is_generated: false,
+                                        confidence: ConfidenceBand::High,
                                     });
                                 }
                             }
@@ -190,6 +198,8 @@ fn extract_exports(root: &Node, source: &str, out: &mut Vec<ExportedSymbol>) {
                                     .to_string(),
                                 kind: ExportKind::Type,
                                 line: node.start_position().row as u32 + 1,
+                                is_generated: false,
+                                confidence: ConfidenceBand::High,
                             });
                         }
                     }
@@ -202,6 +212,8 @@ fn extract_exports(root: &Node, source: &str, out: &mut Vec<ExportedSymbol>) {
                                     .to_string(),
                                 kind: ExportKind::Interface,
                                 line: node.start_position().row as u32 + 1,
+                                is_generated: false,
+                                confidence: ConfidenceBand::High,
                             });
                         }
                     }
@@ -214,6 +226,8 @@ fn extract_exports(root: &Node, source: &str, out: &mut Vec<ExportedSymbol>) {
                                     .to_string(),
                                 kind: ExportKind::Enum,
                                 line: node.start_position().row as u32 + 1,
+                                is_generated: false,
+                                confidence: ConfidenceBand::High,
                             });
                         }
                     }
@@ -246,6 +260,8 @@ fn extract_exports(root: &Node, source: &str, out: &mut Vec<ExportedSymbol>) {
                             name: sym.clone(),
                             kind: ExportKind::Const,
                             line: node.start_position().row as u32 + 1,
+                            is_generated: false,
+                            confidence: ConfidenceBand::High,
                         });
                     }
                     let _ = module_source;

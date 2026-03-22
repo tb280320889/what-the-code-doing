@@ -143,6 +143,8 @@ fn visit_node(
                     name: name.clone(),
                     kind: ExportKind::Function,
                     line,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 });
                 push_visibility_meta(&name, line, side_effects);
 
@@ -165,6 +167,8 @@ fn visit_node(
                     name: name.clone(),
                     kind: ExportKind::Function,
                     line,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 });
                 push_visibility_meta(&name, line, side_effects);
 
@@ -214,6 +218,8 @@ fn visit_node(
                     name: name.clone(),
                     kind: export_kind,
                     line,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 });
                 push_visibility_meta(&name, line, side_effects);
 
@@ -244,6 +250,8 @@ fn visit_node(
                             name: name.clone(),
                             kind: export_kind.clone(),
                             line,
+                            is_generated: false,
+                            confidence: ConfidenceBand::High,
                         });
                         push_visibility_meta(&name, line, side_effects);
                     }

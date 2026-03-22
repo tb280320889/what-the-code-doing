@@ -121,6 +121,8 @@ fn visit_node(
                         name: name.clone(),
                         kind: ExportKind::Function,
                         line,
+                        is_generated: false,
+                        confidence: ConfidenceBand::High,
                     });
 
                     let (parameters, return_type) = extract_cpp_signature(node, source);
@@ -149,6 +151,8 @@ fn visit_node(
                         name: name.clone(),
                         kind,
                         line,
+                        is_generated: false,
+                        confidence: ConfidenceBand::High,
                     });
                     side_effects.push(SideEffect {
                         kind: SideEffectKind::Log,
@@ -178,6 +182,8 @@ fn visit_node(
                         name: name.clone(),
                         kind: ExportKind::Enum,
                         line,
+                        is_generated: false,
+                        confidence: ConfidenceBand::High,
                     });
                     side_effects.push(SideEffect {
                         kind: SideEffectKind::Log,
