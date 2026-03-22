@@ -26,55 +26,55 @@ v0.1.1 里程碑需求：扩展多语言支持（Python, Go）并新增模块级
 
 ### Python Adapter
 
-- [ ] **PY-01**: User can parse Python files using tree-sitter-python with error tolerance (confidence: low on parse failure)
-- [ ] **PY-02**: User can extract function definitions (def name(params) -> return_type) with type annotations
-- [ ] **PY-03**: User can extract class definitions (class Name(Base):) with base class info
-- [ ] **PY-04**: User can extract import statements: import X, from X import Y, relative imports (from .X import Y)
-- [ ] **PY-05**: User can detect decorators (@decorator) on functions and classes as metadata
-- [ ] **PY-06**: User can handle __init__.py files as package markers
-- [ ] **PY-07**: User can parse __all__ declarations for explicit export filtering
-- [ ] **PY-08**: User can identify @property, @staticmethod, @classmethod method types
-- [ ] **PY-09**: User can detect dataclass and Pydantic BaseModel patterns
+- [x] **PY-01**: User can parse Python files using tree-sitter-python with error tolerance (confidence: low on parse failure)
+- [x] **PY-02**: User can extract function definitions (def name(params) -> return_type) with type annotations
+- [x] **PY-03**: User can extract class definitions (class Name(Base):) with base class info
+- [x] **PY-04**: User can extract import statements: import X, from X import Y, relative imports (from .X import Y)
+- [x] **PY-05**: User can detect decorators (@decorator) on functions and classes as metadata
+- [x] **PY-06**: User can handle __init__.py files as package markers
+- [x] **PY-07**: User can parse __all__ declarations for explicit export filtering
+- [x] **PY-08**: User can identify @property, @staticmethod, @classmethod method types
+- [x] **PY-09**: User can detect dataclass and Pydantic BaseModel patterns
 
 ### Go Adapter
 
-- [ ] **GO-01**: User can parse Go files using tree-sitter-go with error tolerance (confidence: low on parse failure)
-- [ ] **GO-02**: User can extract function declarations (func Name(params) returns)
-- [ ] **GO-03**: User can extract method declarations with receivers (func (T) Method())
-- [ ] **GO-04**: User can extract type declarations: struct, interface, type alias
-- [ ] **GO-05**: User can extract import statements (import "pkg", import alias "path")
-- [ ] **GO-06**: User can extract constant and variable declarations
-- [ ] **GO-07**: User can determine export visibility (uppercase = exported, lowercase = private)
-- [ ] **GO-08**: User can extract struct fields with types and tags
-- [ ] **GO-09**: User can extract interface method signatures
-- [ ] **GO-10**: User can identify embedded structs (type T struct { Base })
-- [ ] **GO-11**: User can detect goroutine and channel patterns as side effects
-- [ ] **GO-12**: User can detect compiler directives (//go:embed, //go:generate)
+- [x] **GO-01**: User can parse Go files using tree-sitter-go with error tolerance (confidence: low on parse failure)
+- [x] **GO-02**: User can extract function declarations (func Name(params) returns)
+- [x] **GO-03**: User can extract method declarations with receivers (func (T) Method())
+- [x] **GO-04**: User can extract type declarations: struct, interface, type alias
+- [x] **GO-05**: User can extract import statements (import "pkg", import alias "path")
+- [x] **GO-06**: User can extract constant and variable declarations
+- [x] **GO-07**: User can determine export visibility (uppercase = exported, lowercase = private)
+- [x] **GO-08**: User can extract struct fields with types and tags
+- [x] **GO-09**: User can extract interface method signatures
+- [x] **GO-10**: User can identify embedded structs (type T struct { Base })
+- [x] **GO-11**: User can detect goroutine and channel patterns as side effects
+- [x] **GO-12**: User can detect compiler directives (//go:embed, //go:generate)
 
 ### Module Aggregation
 
-- [ ] **MOD-01**: User can aggregate exports from all files in a module into module-level summary
-- [ ] **MOD-02**: User can aggregate dependencies from all files in a module
-- [ ] **MOD-03**: User can generate module-level responsibility description from file mirrors
-- [ ] **MOD-04**: User can list all files belonging to a module
-- [ ] **MOD-05**: User can aggregate side effects from all files in a module
-- [ ] **MOD-06**: User can build intra-module dependency graph from import resolution
-- [ ] **MOD-07**: User can auto-detect module boundaries per language (Python: __init__.py, Go: package, TS: directory)
-- [ ] **MOD-08**: User can calculate module-level semantic fingerprint (hash of sorted child fingerprints)
-- [ ] **MOD-09**: User can detect module-level drift via C0-C3 rollup from file-level drift
-- [ ] **MOD-10**: User can calculate fan-in/fan-out statistics per module
+- [x] **MOD-01**: User can aggregate exports from all files in a module into module-level summary
+- [x] **MOD-02**: User can aggregate dependencies from all files in a module
+- [x] **MOD-03**: User can generate module-level responsibility description from file mirrors
+- [x] **MOD-04**: User can list all files belonging to a module
+- [x] **MOD-05**: User can aggregate side effects from all files in a module
+- [x] **MOD-06**: User can build intra-module dependency graph from import resolution
+- [x] **MOD-07**: User can auto-detect module boundaries per language (Python: __init__.py, Go: package, TS: directory)
+- [x] **MOD-08**: User can calculate module-level semantic fingerprint (hash of sorted child fingerprints)
+- [x] **MOD-09**: User can detect module-level drift via C0-C3 rollup from file-level drift
+- [x] **MOD-10**: User can calculate fan-in/fan-out statistics per module
 
 ### Knowledge Layer
 
-- [ ] **KNOW-01**: User can generate repository overview document (language distribution, module list, entry points)
-- [ ] **KNOW-02**: User can generate module dependency graph in Mermaid format
-- [ ] **KNOW-03**: User can generate global export index across all modules
-- [ ] **KNOW-04**: User can generate language and file statistics
-- [ ] **KNOW-05**: User can perform semantic clustering via community detection algorithm
-- [ ] **KNOW-06**: User can generate change hotspot map from drift history
-- [ ] **KNOW-07**: User can calculate token compression ratio (mirror_tokens / source_tokens)
-- [ ] **KNOW-08**: User can suggest Agent read paths based on dependency graph + routing index
-- [ ] **KNOW-09**: User can generate ADR skeleton from C2/C3 drift reports
+- [x] **KNOW-01**: User can generate repository overview document (language distribution, module list, entry points)
+- [x] **KNOW-02**: User can generate module dependency graph in Mermaid format
+- [x] **KNOW-03**: User can generate global export index across all modules
+- [x] **KNOW-04**: User can generate language and file statistics
+- [x] **KNOW-05**: User can perform semantic clustering via community detection algorithm
+- [x] **KNOW-06**: User can generate change hotspot map from drift history
+- [x] **KNOW-07**: User can calculate token compression ratio (mirror_tokens / source_tokens)
+- [x] **KNOW-08**: User can suggest Agent read paths based on dependency graph + routing index
+- [x] **KNOW-09**: User can generate ADR skeleton from C2/C3 drift reports
 
 ## Future Requirements
 
@@ -111,10 +111,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PY-01 ~ PY-09 | Phase 5 | Pending |
-| GO-01 ~ GO-12 | Phase 6 | Pending |
-| MOD-01 ~ MOD-10 | Phase 7 | Pending |
-| KNOW-01 ~ KNOW-09 | Phase 8 | Pending |
+| PY-01 ~ PY-09 | Phase 5 | Complete |
+| GO-01 ~ GO-12 | Phase 6 | Complete |
+| MOD-01 ~ MOD-10 | Phase 7 | Complete |
+| KNOW-01 ~ KNOW-09 | Phase 8 | Complete |
 
 **Coverage:**
 - v0.1.1 requirements: 40 total

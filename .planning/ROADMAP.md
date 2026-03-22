@@ -5,7 +5,7 @@
 **Granularity:** Coarse
 **Total v0.1.1 Requirements:** 40
 **Phases:** 4 (Phase 5–8)
-**Status:** 🚧 IN PROGRESS
+**Status:** ✅ COMPLETE (Phases 5-8 completed)
 
 ---
 
@@ -18,10 +18,10 @@
 
 ## Phases
 
-- [ ] **Phase 5: Python Adapter** — Python tree-sitter 解析适配器，提取函数/类/import/装饰器/类型注解
-- [ ] **Phase 6: Go Adapter** — Go tree-sitter 解析适配器，提取函数/方法/struct/interface/import/可见性
-- [ ] **Phase 7: Module Aggregation** — 模块级镜像聚合：导出汇总、依赖图、指纹、漂移检测
-- [ ] **Phase 8: Knowledge Layer** — 知识层文档生成：仓库总览、模块关系图、导出索引、统计
+- [x] **Phase 5: Python Adapter** — Python tree-sitter 解析适配器，提取函数/类/import/装饰器/类型注解
+- [x] **Phase 6: Go Adapter** — Go tree-sitter 解析适配器，提取函数/方法/struct/interface/import/可见性
+- [x] **Phase 7: Module Aggregation** — 模块级镜像聚合：导出汇总、依赖图、指纹、漂移检测
+- [x] **Phase 8: Knowledge Layer** — 知识层文档生成：仓库总览、模块关系图、导出索引、统计
 
 ---
 
@@ -65,11 +65,11 @@
   4. Decorators on functions and classes appear as metadata in the output
   5. `__init__.py` files are recognized as package markers; `__all__` declarations filter exported symbols
   6. Parser gracefully degrades on Python syntax errors — output includes `confidence: low` instead of crashing
-**Plans**: TBD
+**Plans**: 2
 
 Plans:
-- [ ] 05-01: [To be planned]
-- [ ] 05-02: [To be planned]
+- [x] 05-01: Python adapter core implementation（tree-sitter-python + 提取 + 注册）
+- [x] 05-02: Python adapter test suite（fixtures + 单元测试 + 集成测试）
 
 ### Phase 6: Go Adapter
 **Goal**: Users can parse Go files and extract structured semantic facts (functions, methods, types, imports, visibility) via the existing LanguageAdapter pipeline
@@ -126,10 +126,10 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 5. Python Adapter | 0/TBD | Not started | - |
-| 6. Go Adapter | 0/TBD | Not started | - |
-| 7. Module Aggregation | 0/TBD | Not started | - |
-| 8. Knowledge Layer | 0/TBD | Not started | - |
+| 5. Python Adapter | 2/2 | Complete | 2026-03-22 |
+| 6. Go Adapter | 1/1 | Complete | 2026-03-22 |
+| 7. Module Aggregation | 1/1 | Complete | 2026-03-22 |
+| 8. Knowledge Layer | 1/1 | Complete | 2026-03-22 |
 
 ---
 
@@ -137,46 +137,46 @@ Plans:
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PY-01 | Phase 5 | Pending |
-| PY-02 | Phase 5 | Pending |
-| PY-03 | Phase 5 | Pending |
-| PY-04 | Phase 5 | Pending |
-| PY-05 | Phase 5 | Pending |
-| PY-06 | Phase 5 | Pending |
-| PY-07 | Phase 5 | Pending |
-| PY-08 | Phase 5 | Pending |
-| PY-09 | Phase 5 | Pending |
-| GO-01 | Phase 6 | Pending |
-| GO-02 | Phase 6 | Pending |
-| GO-03 | Phase 6 | Pending |
-| GO-04 | Phase 6 | Pending |
-| GO-05 | Phase 6 | Pending |
-| GO-06 | Phase 6 | Pending |
-| GO-07 | Phase 6 | Pending |
-| GO-08 | Phase 6 | Pending |
-| GO-09 | Phase 6 | Pending |
-| GO-10 | Phase 6 | Pending |
-| GO-11 | Phase 6 | Pending |
-| GO-12 | Phase 6 | Pending |
-| MOD-01 | Phase 7 | Pending |
-| MOD-02 | Phase 7 | Pending |
-| MOD-03 | Phase 7 | Pending |
-| MOD-04 | Phase 7 | Pending |
-| MOD-05 | Phase 7 | Pending |
-| MOD-06 | Phase 7 | Pending |
-| MOD-07 | Phase 7 | Pending |
-| MOD-08 | Phase 7 | Pending |
-| MOD-09 | Phase 7 | Pending |
-| MOD-10 | Phase 7 | Pending |
-| KNOW-01 | Phase 8 | Pending |
-| KNOW-02 | Phase 8 | Pending |
-| KNOW-03 | Phase 8 | Pending |
-| KNOW-04 | Phase 8 | Pending |
-| KNOW-05 | Phase 8 | Pending |
-| KNOW-06 | Phase 8 | Pending |
-| KNOW-07 | Phase 8 | Pending |
-| KNOW-08 | Phase 8 | Pending |
-| KNOW-09 | Phase 8 | Pending |
+| PY-01 | Phase 5 | Complete |
+| PY-02 | Phase 5 | Complete |
+| PY-03 | Phase 5 | Complete |
+| PY-04 | Phase 5 | Complete |
+| PY-05 | Phase 5 | Complete |
+| PY-06 | Phase 5 | Complete |
+| PY-07 | Phase 5 | Complete |
+| PY-08 | Phase 5 | Complete |
+| PY-09 | Phase 5 | Complete |
+| GO-01 | Phase 6 | Complete |
+| GO-02 | Phase 6 | Complete |
+| GO-03 | Phase 6 | Complete |
+| GO-04 | Phase 6 | Complete |
+| GO-05 | Phase 6 | Complete |
+| GO-06 | Phase 6 | Complete |
+| GO-07 | Phase 6 | Complete |
+| GO-08 | Phase 6 | Complete |
+| GO-09 | Phase 6 | Complete |
+| GO-10 | Phase 6 | Complete |
+| GO-11 | Phase 6 | Complete |
+| GO-12 | Phase 6 | Complete |
+| MOD-01 | Phase 7 | Complete |
+| MOD-02 | Phase 7 | Complete |
+| MOD-03 | Phase 7 | Complete |
+| MOD-04 | Phase 7 | Complete |
+| MOD-05 | Phase 7 | Complete |
+| MOD-06 | Phase 7 | Complete |
+| MOD-07 | Phase 7 | Complete |
+| MOD-08 | Phase 7 | Complete |
+| MOD-09 | Phase 7 | Complete |
+| MOD-10 | Phase 7 | Complete |
+| KNOW-01 | Phase 8 | Complete |
+| KNOW-02 | Phase 8 | Complete |
+| KNOW-03 | Phase 8 | Complete |
+| KNOW-04 | Phase 8 | Complete |
+| KNOW-05 | Phase 8 | Complete |
+| KNOW-06 | Phase 8 | Complete |
+| KNOW-07 | Phase 8 | Complete |
+| KNOW-08 | Phase 8 | Complete |
+| KNOW-09 | Phase 8 | Complete |
 
 **Coverage: 40/40 v0.1.1 requirements mapped ✅**
 
@@ -202,4 +202,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-03-21*
-*Ready for: `/gsd-plan-phase 5`*
+*Ready for: `/gsd-execute-plan 05-01`*
