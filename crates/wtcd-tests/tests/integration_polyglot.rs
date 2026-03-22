@@ -286,3 +286,107 @@ fn test_parse_time_sanity() {
         );
     }
 }
+
+// ---------------------------------------------------------------------------
+// Scanner-registry consistency (STAB-04)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_scanner_registry_extension_consistency() {
+    let registry = register_all_adapters().unwrap();
+
+    // All extensions that adapters claim
+    let mut adapter_extensions: Vec<String> = Vec::new();
+    // We can't directly iterate adapters, but we know the expected set
+    let expected_extensions = &[
+        "ts", "tsx", "js", "jsx", // TS/JS
+        "py", "pyi",  // Python
+        "go",   // Go
+        "rs",   // Rust
+        "dart", // Dart
+        "java", // Java
+        "kt", "kts",   // Kotlin
+        "swift", // Swift
+        "c", "h", // C
+        "cpp", "cc", "cxx", "hpp", "hh", "hxx", // C++
+        "cs",  // C#
+        "zig", // Zig
+    ];
+
+    for ext in expected_extensions {
+        let test_file = format!("test.{}", ext);
+        let adapter = registry.find_adapter(&test_file);
+        assert!(
+            adapter.is_some(),
+            "No adapter registered for extension .{} — scanner/registry mismatch",
+            ext
+        );
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Existing adapter regression (ROUT-04)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_existing_adapters_no_regression() {
+    let registry = register_all_adapters().unwrap();
+
+    // TS/JS
+    let ts_adapter = registry.find_adapter("test.ts").unwrap();
+    let ts_result = ts_adapter.parse("export const x = 1;", "test.ts");
+    assert_eq!(ts_result.confidence, ConfidenceBand::High);
+    assert!(!ts_result.exports.is_empty());
+
+    // Python
+    let py_adapter = registry.find_adapter("test.py").unwrap();
+    let py_result = py_adapter.parse("def hello():\n    pass\n", "test.py");
+    assert_eq!(py_result.confidence, ConfidenceBand::High);
+    assert!(!py_result.exports.is_empty());
+
+    // Go
+    let go_adapter = registry.find_adapter("test.go").unwrap();
+    let go_result = go_adapter.parse("package main\n\nfunc Hello() {}\n", "test.go");
+    assert_eq!(go_result.confidence, ConfidenceBand::High);
+    assert!(!go_result.exports.is_empty());
+}
+
+// ---------------------------------------------------------------------------
+// Full performance budget (STAB-02) — all 13 languages
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_parse_time_budget_all_languages() {
+    let registry = register_all_adapters().unwrap();
+
+    let all_fixtures: &[(&str, &str)] = &[
+        // Existing languages
+        ("ts/basic_exports.ts", "basic.ts"),
+        ("python/hello.py", "hello.py"),
+        ("go/sample.go", "sample.go"),
+        // New polyglot languages
+        ("c/hello.c", "hello.c"),
+        ("cpp/hello.cpp", "hello.cpp"),
+        ("csharp/hello.cs", "hello.cs"),
+        ("dart/hello.dart", "hello.dart"),
+        ("java/hello.java", "hello.java"),
+        ("kotlin/hello.kt", "hello.kt"),
+        ("rust/hello.rs", "hello.rs"),
+        ("swift/hello.swift", "hello.swift"),
+        ("zig/hello.zig", "hello.zig"),
+    ];
+
+    for (fixture, filename) in all_fixtures {
+        let adapter = registry.find_adapter(filename).unwrap();
+        let source = std::fs::read_to_string(fixture_path(fixture))
+            .unwrap_or_else(|e| panic!("Cannot read {}: {}", fixture, e));
+        let result = adapter.parse(&source, filename);
+
+        assert!(
+            result.parse_time_ms < 100,
+            "{}: parse took {}ms (budget: 100ms)",
+            filename,
+            result.parse_time_ms
+        );
+    }
+}
