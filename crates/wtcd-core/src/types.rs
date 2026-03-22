@@ -127,6 +127,27 @@ pub struct ModuleResult {
     pub confidence: ConfidenceBand,
 }
 
+/// Per-language extraction capability info
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LanguageCapability {
+    /// Language name (e.g., "typescript", "rust")
+    pub language: String,
+    /// Number of files in this language
+    pub file_count: usize,
+    /// Number of modules in this language
+    pub module_count: usize,
+    /// Whether exports extraction is supported
+    pub has_exports: bool,
+    /// Whether imports extraction is supported
+    pub has_imports: bool,
+    /// Whether signatures extraction is supported
+    pub has_signatures: bool,
+    /// Whether side_effects extraction is supported
+    pub has_side_effects: bool,
+    /// Confidence distribution: (high, low, none) counts
+    pub confidence_distribution: (usize, usize, usize),
+}
+
 /// Repository-level knowledge output (Phase 8)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KnowledgeResult {
@@ -135,6 +156,12 @@ pub struct KnowledgeResult {
     pub total_files: usize,
     pub total_exports: usize,
     pub token_compression_ratio: f64,
+    /// Per-language extraction capability matrix
+    #[serde(default)]
+    pub language_matrix: std::collections::BTreeMap<String, LanguageCapability>,
+    /// Module IDs with low or no confidence
+    #[serde(default)]
+    pub low_confidence_modules: Vec<String>,
 }
 
 /// Run-level summary statistics (D-07)

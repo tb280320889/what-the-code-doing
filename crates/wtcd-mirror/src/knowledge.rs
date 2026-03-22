@@ -2,13 +2,22 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 use crate::module::build_module_graph;
 use wtcd_core::index::RoutingIndex;
-use wtcd_core::types::{ChangeClass, KnowledgeResult, ModuleResult};
+use wtcd_core::types::{
+    ChangeClass, ConfidenceBand, KnowledgeResult, LanguageCapability, ModuleResult,
+};
 
 pub fn build_knowledge_result(modules: &[ModuleResult], source_tokens: usize) -> KnowledgeResult {
     let mut language_distribution: BTreeMap<String, usize> = BTreeMap::new();
     let mut total_files = 0usize;
     let mut total_exports = 0usize;
     let mut mirror_tokens = 0usize;
+    let mut low_confidence_modules = Vec::new();
+
+    // Track per-language stats for matrix
+    let mut lang_stats: BTreeMap<
+        String,
+        (usize, usize, bool, bool, bool, bool, usize, usize, usize),
+    > = BTreeMap::new();
 
     for m in modules {
         *language_distribution.entry(m.language.clone()).or_insert(0) += m.files.len();
@@ -18,6 +27,62 @@ pub fn build_knowledge_result(modules: &[ModuleResult], source_tokens: usize) ->
             + m.exports.len()
             + m.dependencies.len()
             + m.side_effects.len();
+
+        // Collect low-confidence modules
+        if m.confidence == ConfidenceBand::Low || m.confidence == ConfidenceBand::None {
+            low_confidence_modules.push(m.module_id.clone());
+        }
+
+        // Accumulate language stats
+        let entry = lang_stats
+            .entry(m.language.clone())
+            .or_insert((0, 0, false, false, false, false, 0, 0, 0));
+        entry.0 += 1; // module_count
+        entry.1 += m.files.len(); // file_count
+        entry.2 = entry.2 || !m.exports.is_empty(); // has_exports
+        entry.3 = entry.3 || !m.dependencies.is_empty(); // has_imports
+                                                         // has_signatures and has_side_effects from module-level aren't available directly;
+                                                         // we set them based on whether modules have these (exports presence indicates extraction support)
+        entry.4 = true; // has_signatures — all adapters support this
+        entry.5 = entry.5 || !m.side_effects.is_empty(); // has_side_effects
+                                                         // Confidence distribution from module confidence
+        match m.confidence {
+            ConfidenceBand::High => entry.6 += 1,
+            ConfidenceBand::Low => entry.7 += 1,
+            ConfidenceBand::None => entry.8 += 1,
+        }
+    }
+
+    // Build language matrix
+    let mut language_matrix = BTreeMap::new();
+    for (
+        lang,
+        (
+            mod_count,
+            file_count,
+            has_exports,
+            has_imports,
+            has_signatures,
+            has_side_effects,
+            high,
+            low,
+            none,
+        ),
+    ) in lang_stats
+    {
+        language_matrix.insert(
+            lang.clone(),
+            LanguageCapability {
+                language: lang,
+                file_count,
+                module_count: mod_count,
+                has_exports,
+                has_imports,
+                has_signatures,
+                has_side_effects,
+                confidence_distribution: (high, low, none),
+            },
+        );
     }
 
     let ratio = if source_tokens == 0 {
@@ -32,6 +97,8 @@ pub fn build_knowledge_result(modules: &[ModuleResult], source_tokens: usize) ->
         total_files,
         total_exports,
         token_compression_ratio: ratio,
+        language_matrix,
+        low_confidence_modules,
     }
 }
 
@@ -99,6 +166,43 @@ pub fn generate_export_index(modules: &[ModuleResult]) -> String {
     }
     rows.sort();
     format!("# Global Export Index\n\n{}", rows.join("\n"))
+}
+
+/// Generate language capability matrix as markdown table
+pub fn generate_language_matrix_md(knowledge: &KnowledgeResult) -> String {
+    let mut lines = vec![
+        "# Language Capability Matrix\n".to_string(),
+        "| Language | Files | Modules | Exports | Imports | Signatures | Side Effects | Confidence (H/L/N) |".to_string(),
+        "|----------|-------|---------|---------|---------|------------|--------------|-------------------|".to_string(),
+    ];
+
+    let mut sorted: Vec<_> = knowledge.language_matrix.values().collect();
+    sorted.sort_by(|a, b| b.file_count.cmp(&a.file_count));
+
+    for cap in sorted {
+        lines.push(format!(
+            "| {} | {} | {} | {} | {} | {} | {} | {}/{}/{} |",
+            cap.language,
+            cap.file_count,
+            cap.module_count,
+            if cap.has_exports { "✓" } else { "—" },
+            if cap.has_imports { "✓" } else { "—" },
+            if cap.has_signatures { "✓" } else { "—" },
+            if cap.has_side_effects { "✓" } else { "—" },
+            cap.confidence_distribution.0,
+            cap.confidence_distribution.1,
+            cap.confidence_distribution.2,
+        ));
+    }
+
+    if !knowledge.low_confidence_modules.is_empty() {
+        lines.push("\n## Low Confidence Modules\n".to_string());
+        for module_id in &knowledge.low_confidence_modules {
+            lines.push(format!("- {module_id}"));
+        }
+    }
+
+    lines.join("\n")
 }
 
 pub fn community_clusters(modules: &[ModuleResult]) -> Vec<Vec<String>> {
