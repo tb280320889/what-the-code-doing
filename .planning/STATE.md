@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v0.2.0
 milestone_name: polyglot-adapters
-status: defining_requirements
-last_updated: "2026-03-22T00:00:00Z"
+status: roadmap_defined
+last_updated: "2026-03-22T01:00:00Z"
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -14,9 +14,9 @@ progress:
 # STATE.md — WTCD Project Memory
 
 **Last updated:** 2026-03-22
-**Phase:** Not started (defining requirements)
-**Plan:** -
-**Status:** ◆ Defining requirements for milestone v0.2.0
+**Phase:** Phase 9 (not started)
+**Plan:** 未创建（等待 `/gsd-plan-phase 9`）
+**Status:** ◆ Roadmap defined for milestone v0.2.0
 
 ---
 
@@ -37,6 +37,12 @@ progress:
 **Current Milestone:** v0.2.0 — Polyglot Adapters
 目标：新增 Rust、Dart、Java、Kotlin、Swift、C++、C#、C、Zig 9 种语言完整适配器。
 
+**Roadmap (Phase 9–12):**
+- Phase 9: Polyglot Adapter Coverage
+- Phase 10: Aggregation Consistency Hardening
+- Phase 11: Route & Knowledge Signal Quality
+- Phase 12: Stability Gates & Regression Reliability
+
 Progress: [░░░░░░░░░░] 0%
 
 ---
@@ -56,10 +62,11 @@ Progress: [░░░░░░░░░░] 0%
 
 ### Active Todos
 
-- [ ] Research language ecosystem for Rust/Dart/Java/Kotlin/Swift/C++/C#/C/Zig adapters
-- [ ] Define v0.2.0 scoped requirements and REQ IDs
-- [ ] Create v0.2.0 roadmap with continued phase numbering
-- [ ] Start first phase via /gsd-plan-phase [N]
+- [ ] Plan Phase 9 via `/gsd-plan-phase 9`
+- [ ] Execute Phase 9 plans (adapter coverage + scanner/registry routing)
+- [ ] Plan and execute Phase 10 (aggregation consistency)
+- [ ] Plan and execute Phase 11 (route/knowledge signal quality)
+- [ ] Plan and execute Phase 12 (stability gates + regression reliability)
 
 ### Blockers
 
@@ -86,4 +93,4 @@ None currently.
 ---
 
 *Created: 2026-03-21 after roadmap initialization*
-*Last session: 2026-03-22 — v0.2.0 milestone initialized (questioning complete)*
+*Last session: 2026-03-22 — v0.2.0 roadmap created with phases 9–12*

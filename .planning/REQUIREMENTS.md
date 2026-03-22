@@ -107,35 +107,35 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ADPT-01 | TBD | Pending |
-| ADPT-02 | TBD | Pending |
-| ADPT-03 | TBD | Pending |
-| ADPT-04 | TBD | Pending |
-| ADPT-05 | TBD | Pending |
-| ADPT-06 | TBD | Pending |
-| ADPT-07 | TBD | Pending |
-| ADPT-08 | TBD | Pending |
-| ADPT-09 | TBD | Pending |
-| ADPT-10 | TBD | Pending |
-| ADPT-11 | TBD | Pending |
-| ADPT-12 | TBD | Pending |
-| CONS-01 | TBD | Pending |
-| CONS-02 | TBD | Pending |
-| CONS-03 | TBD | Pending |
-| CONS-04 | TBD | Pending |
-| ROUT-01 | TBD | Pending |
-| ROUT-02 | TBD | Pending |
-| ROUT-03 | TBD | Pending |
-| ROUT-04 | TBD | Pending |
-| STAB-01 | TBD | Pending |
-| STAB-02 | TBD | Pending |
-| STAB-03 | TBD | Pending |
-| STAB-04 | TBD | Pending |
+| ADPT-01 | Phase 9 | Pending |
+| ADPT-02 | Phase 9 | Pending |
+| ADPT-03 | Phase 9 | Pending |
+| ADPT-04 | Phase 9 | Pending |
+| ADPT-05 | Phase 9 | Pending |
+| ADPT-06 | Phase 9 | Pending |
+| ADPT-07 | Phase 9 | Pending |
+| ADPT-08 | Phase 9 | Pending |
+| ADPT-09 | Phase 9 | Pending |
+| ADPT-10 | Phase 9 | Pending |
+| ADPT-11 | Phase 9 | Pending |
+| ADPT-12 | Phase 12 | Pending |
+| CONS-01 | Phase 10 | Pending |
+| CONS-02 | Phase 10 | Pending |
+| CONS-03 | Phase 10 | Pending |
+| CONS-04 | Phase 10 | Pending |
+| ROUT-01 | Phase 11 | Pending |
+| ROUT-02 | Phase 11 | Pending |
+| ROUT-03 | Phase 11 | Pending |
+| ROUT-04 | Phase 12 | Pending |
+| STAB-01 | Phase 12 | Pending |
+| STAB-02 | Phase 12 | Pending |
+| STAB-03 | Phase 12 | Pending |
+| STAB-04 | Phase 12 | Pending |
 
 **Coverage:**
 - v0.2.0 requirements: 24 total
-- Mapped to phases: 0
-- Unmapped: 24 ⚠️
+- Mapped to phases: 24
+- Unmapped: 0 ✅
 
 ---
 *Requirements defined: 2026-03-21*

@@ -1,124 +1,76 @@
 # Roadmap: WTCD — What The Code Doing
 
-**Milestone:** v0.1.1 — Multi-Language & Knowledge Layer
-**Created:** 2026-03-21
+**Milestone:** v0.2.0 — Polyglot Adapters
+**Created:** 2026-03-22
 **Granularity:** Coarse
-**Total v0.1.1 Requirements:** 40
-**Phases:** 4 (Phase 5–8)
-**Status:** ✅ COMPLETE (Phases 5-8 completed)
+**Total v0.2.0 Requirements:** 24
+**Phases:** 4 (Phase 9–12)
+**Status:** Drafted (awaiting phase planning)
 
 ---
 
 ## Milestones
 
-- ✅ **v1.0 MVP** — Phases 1–4 + 999.1 (shipped 2026-03-21, 38/38 requirements)
-- 🚧 **v0.1.1 Multi-Language & Knowledge** — Phases 5–8 (in progress)
+- ✅ **v1.0 MVP** — Phases 1–4 + 999.1
+- ✅ **v0.1.1 Multi-Language & Knowledge** — Phases 5–8
+- 🚧 **v0.2.0 Polyglot Adapters** — Phases 9–12 (current)
 
 ---
 
 ## Phases
 
-- [x] **Phase 5: Python Adapter** — Python tree-sitter 解析适配器，提取函数/类/import/装饰器/类型注解
-- [x] **Phase 6: Go Adapter** — Go tree-sitter 解析适配器，提取函数/方法/struct/interface/import/可见性
-- [x] **Phase 7: Module Aggregation** — 模块级镜像聚合：导出汇总、依赖图、指纹、漂移检测
-- [x] **Phase 8: Knowledge Layer** — 知识层文档生成：仓库总览、模块关系图、导出索引、统计
-
----
-
-<details>
-<summary>✅ v1.0 MVP (Phases 1–4 + 999.1) — SHIPPED 2026-03-21</summary>
-
-### Phase 1: Foundation ✅
-**Goal**: Core types, CLI framework, TS/JS parsing, config & scope management
-**Plans**: 5 plans — Complete
-
-### Phase 2: Mirror + Fingerprint ✅
-**Goal**: File mirror generation, semantic fingerprint calculation
-**Plans**: 5 plans — Complete
-
-### Phase 3: Drift + Gate ✅
-**Goal**: Drift detection, CI gate, incremental updates
-**Plans**: 6 plans — Complete
-
-### Phase 4: Index + Route ✅
-**Goal**: Routing index construction, Agent query interface
-**Plans**: 3 plans — Complete
-
-### Phase 999.1: MCP Server ✅
-**Goal**: Expose WTCD core capabilities via MCP protocol
-**Plans**: 3 plans — Complete
-
-</details>
+- [ ] **Phase 9: Polyglot Adapter Coverage** - 新增 9 语言解析与适配器自动接线，打通 `run` 主链路
+- [ ] **Phase 10: Aggregation Consistency Hardening** - 统一跨语言聚合/依赖/漂移语义，消除语义错配
+- [ ] **Phase 11: Route & Knowledge Signal Quality** - 为消费端输出语言能力与置信度信号，提升可决策性
+- [ ] **Phase 12: Stability Gates & Regression Reliability** - 建立全链路回归、性能预算、版本锁与完整门禁
 
 ---
 
 ## Phase Details
 
-### Phase 5: Python Adapter
-**Goal**: Users can parse Python files and extract structured semantic facts (functions, classes, imports, decorators, type annotations) via the existing LanguageAdapter pipeline
-**Depends on**: Phase 1 (existing adapter infrastructure)
-**Requirements**: PY-01, PY-02, PY-03, PY-04, PY-05, PY-06, PY-07, PY-08, PY-09
+### Phase 9: Polyglot Adapter Coverage
+**Goal**: 用户在不改变 CLI 使用方式的情况下，可对 9 种新增语言完成稳定解析与结构化语义提取。
+**Depends on**: Phase 8
+**Requirements**: ADPT-01, ADPT-02, ADPT-03, ADPT-04, ADPT-05, ADPT-06, ADPT-07, ADPT-08, ADPT-09, ADPT-10, ADPT-11
 **Success Criteria** (what must be TRUE):
-  1. User can parse `.py` files via `wtcd run` and see extracted function definitions with parameter names and type annotations
-  2. User can see class definitions with base class information in the parsed output
-  3. User can see all import statements including relative imports (`from .X import Y`) in dependency edges
-  4. Decorators on functions and classes appear as metadata in the output
-  5. `__init__.py` files are recognized as package markers; `__all__` declarations filter exported symbols
-  6. Parser gracefully degrades on Python syntax errors — output includes `confidence: low` instead of crashing
-**Plans**: 2
-
-Plans:
-- [x] 05-01: Python adapter core implementation（tree-sitter-python + 提取 + 注册）
-- [x] 05-02: Python adapter test suite（fixtures + 单元测试 + 集成测试）
-
-### Phase 6: Go Adapter
-**Goal**: Users can parse Go files and extract structured semantic facts (functions, methods, types, imports, visibility) via the existing LanguageAdapter pipeline
-**Depends on**: Phase 1 (existing adapter infrastructure)
-**Requirements**: GO-01, GO-02, GO-03, GO-04, GO-05, GO-06, GO-07, GO-08, GO-09, GO-10, GO-11, GO-12
-**Success Criteria** (what must be TRUE):
-  1. User can parse `.go` files via `wtcd run` and see extracted function declarations with parameter and return types
-  2. User can see method declarations with receiver types and struct fields with types and tags
-  3. User can see interface definitions with method signatures and embedded struct relationships
-  4. Export visibility is correctly determined by uppercase/lowercase first letter of identifiers
-  5. Goroutine/channel usage and compiler directives (`//go:embed`, `//go:generate`) appear as side effect metadata
-  6. Parser gracefully degrades on Go syntax errors — output includes `confidence: low` instead of crashing
+  1. 用户运行 `wtcd run` 时，Rust/Dart/Java/Kotlin/Swift/C++/C#/C/Zig 文件都能被解析并输出 exports/imports/signatures/side effects 与 confidence。
+  2. 用户在混合语言仓库中可以看到新增扩展名被扫描器正确识别并分派到对应适配器。
+  3. 用户无需学习任何新增 CLI 子命令，即可通过既有 `run/check/route` 流程使用新语言能力。
+  4. 用户在新语言存在语法错误时，流程不会崩溃，结果会以低置信度可见降级呈现。
 **Plans**: TBD
 
-Plans:
-- [ ] 06-01: [To be planned]
-- [ ] 06-02: [To be planned]
-
-### Phase 7: Module Aggregation
-**Goal**: File-level mirror results are aggregated into module-level summaries with dependency graphs, semantic fingerprints, and drift rollup
-**Depends on**: Phase 5, Phase 6 (multi-language FileResults needed for aggregation)
-**Requirements**: MOD-01, MOD-02, MOD-03, MOD-04, MOD-05, MOD-06, MOD-07, MOD-08, MOD-09, MOD-10
+### Phase 10: Aggregation Consistency Hardening
+**Goal**: 用户可获得跨 13 种语言（既有 + 新增）语义一致的依赖聚合与漂移判定结果。
+**Depends on**: Phase 9
+**Requirements**: CONS-01, CONS-02, CONS-03, CONS-04
 **Success Criteria** (what must be TRUE):
-  1. User can see module-level mirror files under `mirror/module/` containing aggregated exports, dependencies, and responsibility descriptions from all files in the module
-  2. Module boundaries are auto-detected per language (Python: `__init__.py`, Go: `package`, TS: directory) and configurable via `anrsm.yaml`
-  3. Each module has a semantic fingerprint calculated from sorted child fingerprints and a fan-in/fan-out statistics summary
-  4. Module-level drift detection rolls up C0–C3 classifications from file-level drift to the module level
-  5. Intra-module dependency graph is generated showing file-to-file relationships within each module
+  1. 用户在增量影响分析中可看到跨语言 import 被统一归一，影响扩散结果准确且可复现。
+  2. 用户查看模块聚合结果时，TS/JS/Python/Go 与新增 9 语言的导出/依赖语义保持一致口径。
+  3. 用户在包含条件编译或预处理的代码中执行 `wtcd check`，可得到稳定且可解释的漂移分类结果。
+  4. 用户可明确识别 generated/uncertain 符号及其置信度影响，而不是被当作确定事实。
 **Plans**: TBD
 
-Plans:
-- [ ] 07-01: [To be planned]
-- [ ] 07-02: [To be planned]
-
-### Phase 8: Knowledge Layer
-**Goal**: Users can generate repository-level knowledge documents (overview, dependency graph, export index, statistics) compiled from module mirrors
-**Depends on**: Phase 7 (module mirrors are the input)
-**Requirements**: KNOW-01, KNOW-02, KNOW-03, KNOW-04, KNOW-05, KNOW-06, KNOW-07, KNOW-08, KNOW-09
+### Phase 11: Route & Knowledge Signal Quality
+**Goal**: 用户可在 route/knowledge 输出中直接判断语言覆盖边界与置信度风险，降低误命中。
+**Depends on**: Phase 10
+**Requirements**: ROUT-01, ROUT-02, ROUT-03
 **Success Criteria** (what must be TRUE):
-  1. User can find a repository overview document under `mirror/knowledge/` listing language distribution, module count, and entry points
-  2. User can see a module dependency graph in Mermaid format and a global export index across all modules
-  3. User can see language/file statistics and token compression ratio (mirror_tokens / source_tokens) in the knowledge output
-  4. User can see Agent read path suggestions derived from the dependency graph and routing index
-  5. C2/C3 drift reports generate ADR skeleton documents for architectural decision tracking
+  1. 用户执行 `wtcd route <task>` 时，可按语言与置信度信号缩小候选文件范围并减少明显误报。
+  2. 用户在知识层文档中可查看语言能力矩阵，了解每种语言可提取项与覆盖范围。
+  3. 用户在知识层中可直接定位低置信度区域与 generated/uncertain 区域，以便优先人工复核。
 **Plans**: TBD
 
-Plans:
-- [ ] 08-01: [To be planned]
-- [ ] 08-02: [To be planned]
+### Phase 12: Stability Gates & Regression Reliability
+**Goal**: 用户可持续信任 polyglot 扩展后的质量与性能，不会因版本漂移或接线错误在合并后失稳。
+**Depends on**: Phase 11
+**Requirements**: ADPT-12, ROUT-04, STAB-01, STAB-02, STAB-03, STAB-04
+**Success Criteria** (what must be TRUE):
+  1. 用户提交变更后，CI 会对 9 种新增语言执行 `run/check/route` 矩阵验证并在异常时阻断合并。
+  2. 用户可看到解析与增量更新性能预算阈值，超阈值时会被检测并报告。
+  3. 用户可依赖 parser/grammar 版本锁与升级流程，升级后结果可复现且无隐式 ABI 漂移。
+  4. 用户可通过自动化测试在合并前发现 scanner 扩展名与 adapter registry 不一致问题。
+  5. 用户在代表性多语言仓库回归中可验证 route 质量基线保持可信（扩展后不显著退化）。
+**Plans**: TBD
 
 ---
 
@@ -126,80 +78,45 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 5. Python Adapter | 2/2 | Complete | 2026-03-22 |
-| 6. Go Adapter | 1/1 | Complete | 2026-03-22 |
-| 7. Module Aggregation | 1/1 | Complete | 2026-03-22 |
-| 8. Knowledge Layer | 1/1 | Complete | 2026-03-22 |
+| 9. Polyglot Adapter Coverage | 0/0 | Not started | - |
+| 10. Aggregation Consistency Hardening | 0/0 | Not started | - |
+| 11. Route & Knowledge Signal Quality | 0/0 | Not started | - |
+| 12. Stability Gates & Regression Reliability | 0/0 | Not started | - |
 
 ---
 
-## Coverage Validation (v0.1.1)
+## Coverage Validation (v0.2.0)
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PY-01 | Phase 5 | Complete |
-| PY-02 | Phase 5 | Complete |
-| PY-03 | Phase 5 | Complete |
-| PY-04 | Phase 5 | Complete |
-| PY-05 | Phase 5 | Complete |
-| PY-06 | Phase 5 | Complete |
-| PY-07 | Phase 5 | Complete |
-| PY-08 | Phase 5 | Complete |
-| PY-09 | Phase 5 | Complete |
-| GO-01 | Phase 6 | Complete |
-| GO-02 | Phase 6 | Complete |
-| GO-03 | Phase 6 | Complete |
-| GO-04 | Phase 6 | Complete |
-| GO-05 | Phase 6 | Complete |
-| GO-06 | Phase 6 | Complete |
-| GO-07 | Phase 6 | Complete |
-| GO-08 | Phase 6 | Complete |
-| GO-09 | Phase 6 | Complete |
-| GO-10 | Phase 6 | Complete |
-| GO-11 | Phase 6 | Complete |
-| GO-12 | Phase 6 | Complete |
-| MOD-01 | Phase 7 | Complete |
-| MOD-02 | Phase 7 | Complete |
-| MOD-03 | Phase 7 | Complete |
-| MOD-04 | Phase 7 | Complete |
-| MOD-05 | Phase 7 | Complete |
-| MOD-06 | Phase 7 | Complete |
-| MOD-07 | Phase 7 | Complete |
-| MOD-08 | Phase 7 | Complete |
-| MOD-09 | Phase 7 | Complete |
-| MOD-10 | Phase 7 | Complete |
-| KNOW-01 | Phase 8 | Complete |
-| KNOW-02 | Phase 8 | Complete |
-| KNOW-03 | Phase 8 | Complete |
-| KNOW-04 | Phase 8 | Complete |
-| KNOW-05 | Phase 8 | Complete |
-| KNOW-06 | Phase 8 | Complete |
-| KNOW-07 | Phase 8 | Complete |
-| KNOW-08 | Phase 8 | Complete |
-| KNOW-09 | Phase 8 | Complete |
+| ADPT-01 | Phase 9 | Pending |
+| ADPT-02 | Phase 9 | Pending |
+| ADPT-03 | Phase 9 | Pending |
+| ADPT-04 | Phase 9 | Pending |
+| ADPT-05 | Phase 9 | Pending |
+| ADPT-06 | Phase 9 | Pending |
+| ADPT-07 | Phase 9 | Pending |
+| ADPT-08 | Phase 9 | Pending |
+| ADPT-09 | Phase 9 | Pending |
+| ADPT-10 | Phase 9 | Pending |
+| ADPT-11 | Phase 9 | Pending |
+| CONS-01 | Phase 10 | Pending |
+| CONS-02 | Phase 10 | Pending |
+| CONS-03 | Phase 10 | Pending |
+| CONS-04 | Phase 10 | Pending |
+| ROUT-01 | Phase 11 | Pending |
+| ROUT-02 | Phase 11 | Pending |
+| ROUT-03 | Phase 11 | Pending |
+| ADPT-12 | Phase 12 | Pending |
+| ROUT-04 | Phase 12 | Pending |
+| STAB-01 | Phase 12 | Pending |
+| STAB-02 | Phase 12 | Pending |
+| STAB-03 | Phase 12 | Pending |
+| STAB-04 | Phase 12 | Pending |
 
-**Coverage: 40/40 v0.1.1 requirements mapped ✅**
+**Coverage: 24/24 v0.2.0 requirements mapped ✅**
 
 ---
 
-## Pitfall Mitigations (v0.1.1)
-
-| Pitfall | Mitigation |
-|---------|------------|
-| EXT-C1: tree-sitter 版本锁冲突 | All tree-sitter crates lock same minor version; CI compile integration test |
-| EXT-C2: Python 缩进解析边缘情况 | Test with real Django/Flask/FastAPI repos; ERROR nodes degrade to `confidence: low` |
-| EXT-C3: Go 包语义不匹配 | Parse go.mod first; group by package declaration (not directory); filter exports by case |
-| EXT-C5: 知识层生成泛化无用内容 | Only generate verifiable facts (exports, deps, structure); never generate "why" |
-| C5: 镜像成为第二真相源 | Every mirror has `source_artifacts` field; gate blocks mirror-only changes |
-
----
-
-## Research Flags
-
-- **Phase 7 (Module Aggregation):** Module boundary definition needs ADR — Python `__init__.py` vs Go `package` vs TS directory unification
-- **Phase 8 (Knowledge Layer):** Output depth/format needs alignment with actual Agent consumption patterns
-
----
-
-*Roadmap created: 2026-03-21*
-*Ready for: `/gsd-execute-plan 05-01`*
+*Roadmap created: 2026-03-22*
+*Ready for: `/gsd-plan-phase 9`*
