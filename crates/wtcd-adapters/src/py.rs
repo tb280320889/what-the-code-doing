@@ -413,7 +413,7 @@ fn extract_imports(source: &str, out: &mut Vec<DependencyEdge>) {
 
         if let Some(rest) = clean.strip_prefix("import ") {
             for part in rest.split(',') {
-                let module = part.trim().split_whitespace().next().unwrap_or("").trim();
+                let module = part.split_whitespace().next().unwrap_or("").trim();
                 if module.is_empty() {
                     continue;
                 }

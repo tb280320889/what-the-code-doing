@@ -49,9 +49,13 @@ async fn main() {
     let cli = Cli::parse();
     let result: anyhow::Result<()> = match cli.command {
         Commands::Init {} => commands::init::run_init(&cli.root).map_err(|e| anyhow::anyhow!(e)),
-        Commands::Run { full } => commands::run::run_analysis(&cli.root, full).map_err(|e| anyhow::anyhow!(e)),
+        Commands::Run { full } => {
+            commands::run::run_analysis(&cli.root, full).map_err(|e| anyhow::anyhow!(e))
+        }
         Commands::Check {} => commands::check::run_check(&cli.root).map_err(|e| anyhow::anyhow!(e)),
-        Commands::Route { query, top_k } => commands::route::run_route(&cli.root, &query, top_k).map_err(|e| anyhow::anyhow!(e)),
+        Commands::Route { query, top_k } => {
+            commands::route::run_route(&cli.root, &query, top_k).map_err(|e| anyhow::anyhow!(e))
+        }
         Commands::Mcp {} => commands::mcp::run_mcp(&cli.root).await,
         Commands::McpInstall { agent } => commands::mcp_install::install_for_agent(&agent),
     };

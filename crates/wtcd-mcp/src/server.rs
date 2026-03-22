@@ -1,9 +1,8 @@
 use std::path::PathBuf;
 
 use rmcp::{
-    handler::server::router::tool::ToolRouter,
-    model::*,
-    tool, tool_handler, tool_router, ServerHandler,
+    handler::server::router::tool::ToolRouter, model::*, tool, tool_handler, tool_router,
+    ServerHandler,
 };
 
 #[derive(Clone)]
@@ -61,8 +60,6 @@ impl ServerHandler for WtcdMcpServer {
         ServerInfo::new(ServerCapabilities::builder().enable_tools().build())
             .with_protocol_version(ProtocolVersion::V_2025_03_26)
             .with_server_info(Implementation::new("wtcd-mcp", env!("CARGO_PKG_VERSION")))
-            .with_instructions(
-                "WTCD MCP Server — 提供代码语义解析、路由、检查和镜像生成工具",
-            )
+            .with_instructions("WTCD MCP Server — 提供代码语义解析、路由、检查和镜像生成工具")
     }
 }

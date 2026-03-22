@@ -51,10 +51,7 @@ pub async fn handle_parse(
                 signatures: vec![],
                 side_effects: vec![],
                 parse_time_ms: 0,
-                error_message: Some(format!(
-                    "No language adapter found for file: {}",
-                    relative
-                )),
+                error_message: Some(format!("No language adapter found for file: {}", relative)),
             },
         };
 

@@ -13,7 +13,7 @@ pub struct DartAdapter {
 impl DartAdapter {
     pub fn new() -> anyhow::Result<Self> {
         let mut parser = Parser::new();
-        parser.set_language(&tree_sitter_dart::language().into())?;
+        parser.set_language(&tree_sitter_dart::language())?;
         Ok(Self {
             parser: Mutex::new(parser),
         })
@@ -269,17 +269,14 @@ fn extract_side_effects(root: &Node, source: &str, out: &mut Vec<SideEffect>) {
 }
 
 fn extract_side_effects_node(node: Node, source: &str, out: &mut Vec<SideEffect>) {
-    match node.kind() {
-        "annotation" => {
-            let line = node.start_position().row as u32 + 1;
-            let text = node.utf8_text(source.as_bytes()).unwrap_or("");
-            out.push(SideEffect {
-                kind: SideEffectKind::Log,
-                target: format!("{META_PREFIX}annotation:{text}"),
-                line,
-            });
-        }
-        _ => {}
+    if node.kind() == "annotation" {
+        let line = node.start_position().row as u32 + 1;
+        let text = node.utf8_text(source.as_bytes()).unwrap_or("");
+        out.push(SideEffect {
+            kind: SideEffectKind::Log,
+            target: format!("{META_PREFIX}annotation:{text}"),
+            line,
+        });
     }
 
     for child in node.children(&mut node.walk()) {

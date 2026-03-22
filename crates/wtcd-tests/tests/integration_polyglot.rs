@@ -33,7 +33,7 @@ fn test_all_polyglot_adapters_registered() {
         let source = std::fs::read_to_string(fixture_path(&format!(
             "{}/hello.{}",
             lang_dir,
-            filename.split('.').last().unwrap()
+            filename.rsplit('.').next().unwrap()
         )))
         .unwrap();
         let result = adapter.parse(&source, filename);
@@ -296,7 +296,6 @@ fn test_scanner_registry_extension_consistency() {
     let registry = register_all_adapters().unwrap();
 
     // All extensions that adapters claim
-    let mut adapter_extensions: Vec<String> = Vec::new();
     // We can't directly iterate adapters, but we know the expected set
     let expected_extensions = &[
         "ts", "tsx", "js", "jsx", // TS/JS

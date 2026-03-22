@@ -421,7 +421,7 @@ test
         let orphan = dir.path().join("orphan.md");
         fs::write(&orphan, "orphan").unwrap();
 
-        let count = delete_orphans(&[orphan.clone()]).unwrap();
+        let count = delete_orphans(std::slice::from_ref(&orphan)).unwrap();
         assert_eq!(count, 1);
         assert!(!orphan.exists());
     }

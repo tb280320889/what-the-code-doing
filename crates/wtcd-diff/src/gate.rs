@@ -142,8 +142,7 @@ pub fn get_exit_code(passed: bool) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use wtcd_core::config::{FailRule, GateConfig, WarnRule};
-    use wtcd_core::types::*;
+    use wtcd_core::config::{FailRule, GateConfig};
 
     fn make_report(material_changes: Vec<MaterialChange>) -> DriftReport {
         DriftReport {
