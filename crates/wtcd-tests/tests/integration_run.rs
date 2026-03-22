@@ -210,3 +210,125 @@ fn test_json_output_serializable() {
     assert!(parsed["files"].is_array());
     assert!(parsed["summary"].is_object());
 }
+
+#[test]
+fn test_python_function_extraction() {
+    let registry = register_all_adapters().unwrap();
+    let adapter = registry.find_adapter("hello.py").unwrap();
+
+    let source = std::fs::read_to_string(fixture_path("python/hello.py")).unwrap();
+    let result = adapter.parse(&source, "hello.py");
+
+    assert_eq!(result.confidence, ConfidenceBand::High);
+    assert!(result.exports.iter().any(|e| e.name == "greet"));
+    assert!(result.exports.iter().any(|e| e.name == "add"));
+
+    let greet = result
+        .signatures
+        .iter()
+        .find(|s| s.name == "greet")
+        .expect("Missing greet signature");
+    assert!(greet.parameters.iter().any(|p| p.name == "name"));
+    assert!(greet.return_type.contains("str") || greet.return_type == "unknown");
+}
+
+#[test]
+fn test_python_class_and_inheritance() {
+    let registry = register_all_adapters().unwrap();
+    let adapter = registry.find_adapter("classes.py").unwrap();
+
+    let source = std::fs::read_to_string(fixture_path("python/classes.py")).unwrap();
+    let result = adapter.parse(&source, "classes.py");
+
+    assert!(result
+        .exports
+        .iter()
+        .any(|e| e.name == "Animal" && e.kind == wtcd_core::types::ExportKind::Class));
+    assert!(result
+        .exports
+        .iter()
+        .any(|e| e.name == "Dog" && e.kind == wtcd_core::types::ExportKind::Class));
+    assert!(result
+        .side_effects
+        .iter()
+        .any(|s| s.target.contains("py-meta:class_base:Animal")));
+}
+
+#[test]
+fn test_python_imports_including_relative() {
+    let registry = register_all_adapters().unwrap();
+    let adapter = registry.find_adapter("imports.py").unwrap();
+
+    let source = std::fs::read_to_string(fixture_path("python/imports.py")).unwrap();
+    let result = adapter.parse(&source, "imports.py");
+
+    assert!(result.imports.iter().any(|i| i.source == "os"));
+    assert!(result.imports.iter().any(|i| i.source == "pathlib"));
+    assert!(result.imports.iter().any(|i| i.source == "."));
+    assert!(result.imports.iter().any(|i| i.source == "..parent"));
+}
+
+#[test]
+fn test_python_decorators_and_patterns() {
+    let registry = register_all_adapters().unwrap();
+    let adapter = registry.find_adapter("decorators.py").unwrap();
+
+    let source = std::fs::read_to_string(fixture_path("python/decorators.py")).unwrap();
+    let result = adapter.parse(&source, "decorators.py");
+
+    assert!(result
+        .side_effects
+        .iter()
+        .any(|s| s.target.contains("py-meta:pattern:dataclass")));
+    assert!(result
+        .side_effects
+        .iter()
+        .any(|s| s.target.contains("py-meta:pattern:pydantic_basemodel")));
+    assert!(result
+        .side_effects
+        .iter()
+        .any(|s| s.target.contains("py-meta:method_type:staticmethod")));
+    assert!(result
+        .side_effects
+        .iter()
+        .any(|s| s.target.contains("py-meta:method_type:classmethod")));
+    assert!(result
+        .side_effects
+        .iter()
+        .any(|s| s.target.contains("py-meta:method_type:property")));
+}
+
+#[test]
+fn test_python_init_and_dunder_all() {
+    let registry = register_all_adapters().unwrap();
+    let adapter = registry.find_adapter("pkg/__init__.py").unwrap();
+
+    let source = std::fs::read_to_string(fixture_path("python/init_package/__init__.py")).unwrap();
+    let result = adapter.parse(&source, "pkg/__init__.py");
+
+    assert!(result.exports.iter().any(|e| e.name == "exported_func"));
+    assert!(result.exports.iter().any(|e| e.name == "ExportedClass"));
+    assert!(!result.exports.iter().any(|e| e.name == "hidden_func"));
+    assert!(result.exports.iter().any(|e| e.name == "__package__"));
+    assert!(result
+        .side_effects
+        .iter()
+        .any(|s| s.target.contains("py-meta:package_marker:true")));
+    assert!(result.side_effects.iter().any(|s| {
+        s.target.contains("py-meta:dunder_all:")
+            && s.target.contains("exported_func")
+            && s.target.contains("ExportedClass")
+    }));
+}
+
+#[test]
+fn test_python_syntax_error_graceful() {
+    let registry = register_all_adapters().unwrap();
+    let adapter = registry.find_adapter("syntax_error.py").unwrap();
+
+    let source = std::fs::read_to_string(fixture_path("python/syntax_error.py")).unwrap();
+    let result = adapter.parse(&source, "syntax_error.py");
+
+    assert!(result.confidence == ConfidenceBand::Low || result.confidence == ConfidenceBand::None);
+    assert!(result.error_message.is_some());
+}
