@@ -318,25 +318,22 @@ fn extract_using_directives(source: &str, out: &mut Vec<DependencyEdge>) {
     }
 }
 
-fn extract_side_effects(root: &Node, source: &str, out: &mut Vec<SideEffect>) {
-    extract_side_effects_node(*root, source, out);
+fn extract_side_effects(root: &Node, _source: &str, out: &mut Vec<SideEffect>) {
+    extract_side_effects_node(*root, out);
 }
 
-fn extract_side_effects_node(node: Node, source: &str, out: &mut Vec<SideEffect>) {
-    match node.kind() {
-        "preprocessor_directive" => {
-            let line = node.start_position().row as u32 + 1;
-            out.push(SideEffect {
-                kind: SideEffectKind::Log,
-                target: format!("{META_PREFIX}preprocessor"),
-                line,
-            });
-        }
-        _ => {}
+fn extract_side_effects_node(node: Node, out: &mut Vec<SideEffect>) {
+    if node.kind() == "preprocessor_directive" {
+        let line = node.start_position().row as u32 + 1;
+        out.push(SideEffect {
+            kind: SideEffectKind::Log,
+            target: format!("{META_PREFIX}preprocessor"),
+            line,
+        });
     }
 
     for child in node.children(&mut node.walk()) {
-        extract_side_effects_node(child, source, out);
+        extract_side_effects_node(child, out);
     }
 }
 

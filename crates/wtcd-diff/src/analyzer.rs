@@ -97,7 +97,7 @@ pub fn analyze_drift(
             before_freshness: "fresh".to_string(),
             after_freshness: "stale".to_string(),
             drift_level: "low".to_string(),
-            reason: format!("Imports a changed file"),
+            reason: "Imports a changed file".to_string(),
             recommended_action: Some("Run anrsm run to update mirror".to_string()),
         });
     }
@@ -108,15 +108,12 @@ pub fn analyze_drift(
         .any(|m| m.change_class == ChangeClass::C3)
     {
         "blocking"
-    } else if material_changes
-        .iter()
-        .any(|m| m.change_class == ChangeClass::C2)
-    {
-        "material"
-    } else if material_changes
-        .iter()
-        .any(|m| m.change_class == ChangeClass::C1)
-    {
+    } else if material_changes.iter().any(|m| {
+        matches!(
+            m.change_class,
+            ChangeClass::C2 | ChangeClass::C1 | ChangeClass::C0
+        )
+    }) {
         "material"
     } else if !material_changes.is_empty() {
         "low"

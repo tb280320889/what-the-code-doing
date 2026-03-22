@@ -40,26 +40,23 @@ pub fn diff_working_tree_vs_head(repo_root: &Path) -> Result<DiffResult> {
 
     for item in iter {
         let item = item?;
-        match item {
-            gix::status::index_worktree::iter::Item::Modification { rela_path, .. } => {
-                let path_str = rela_path.to_str_lossy().to_string();
-                let workdir_path = workdir.join(&path_str);
+        if let gix::status::index_worktree::iter::Item::Modification { rela_path, .. } = item {
+            let path_str = rela_path.to_str_lossy().to_string();
+            let workdir_path = workdir.join(&path_str);
 
-                if !workdir_path.exists() {
-                    // Tracked file deleted from working tree
-                    changed_files.push(ChangedFile {
-                        path: path_str,
-                        status: FileStatus::Deleted,
-                    });
-                } else {
-                    // Tracked file modified in working tree
-                    changed_files.push(ChangedFile {
-                        path: path_str,
-                        status: FileStatus::Modified,
-                    });
-                }
+            if !workdir_path.exists() {
+                // Tracked file deleted from working tree
+                changed_files.push(ChangedFile {
+                    path: path_str,
+                    status: FileStatus::Deleted,
+                });
+            } else {
+                // Tracked file modified in working tree
+                changed_files.push(ChangedFile {
+                    path: path_str,
+                    status: FileStatus::Modified,
+                });
             }
-            _ => {}
         }
     }
 

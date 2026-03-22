@@ -142,14 +142,9 @@ fn visit_node(
                     .unwrap_or("?")
                     .to_string();
                 if !name.is_empty() {
-                    let kind = if node.kind() == "class_specifier" {
-                        ExportKind::Class
-                    } else {
-                        ExportKind::Class
-                    };
                     exports.push(ExportedSymbol {
                         name: name.clone(),
-                        kind,
+                        kind: ExportKind::Class,
                         line,
                         is_generated: false,
                         confidence: ConfidenceBand::High,

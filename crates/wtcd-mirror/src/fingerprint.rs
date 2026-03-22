@@ -339,7 +339,7 @@ mod tests {
 
     #[test]
     fn semantic_fingerprint_stable_on_import_reorder() {
-        let mut result1 = FileResult {
+        let result1 = FileResult {
             file_path: "test.ts".to_string(),
             confidence: ConfidenceBand::High,
             exports: vec![],
@@ -418,7 +418,7 @@ mod tests {
 
     #[test]
     fn compute_fingerprints_export_changes() {
-        let mut result1 = sample_file_result();
+        let result1 = sample_file_result();
         let result2 = {
             let mut r = sample_file_result();
             r.exports.push(ExportedSymbol {

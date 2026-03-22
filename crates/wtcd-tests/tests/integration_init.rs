@@ -1,5 +1,3 @@
-use std::path::Path;
-
 #[test]
 fn test_config_template_valid_yaml() {
     // Verify the default config template is valid YAML

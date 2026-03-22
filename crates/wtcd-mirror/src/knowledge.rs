@@ -6,6 +6,8 @@ use wtcd_core::types::{
     ChangeClass, ConfidenceBand, KnowledgeResult, LanguageCapability, ModuleResult,
 };
 
+type LanguageStats = (usize, usize, bool, bool, bool, bool, usize, usize, usize);
+
 pub fn build_knowledge_result(modules: &[ModuleResult], source_tokens: usize) -> KnowledgeResult {
     let mut language_distribution: BTreeMap<String, usize> = BTreeMap::new();
     let mut total_files = 0usize;
@@ -14,10 +16,7 @@ pub fn build_knowledge_result(modules: &[ModuleResult], source_tokens: usize) ->
     let mut low_confidence_modules = Vec::new();
 
     // Track per-language stats for matrix
-    let mut lang_stats: BTreeMap<
-        String,
-        (usize, usize, bool, bool, bool, bool, usize, usize, usize),
-    > = BTreeMap::new();
+    let mut lang_stats: BTreeMap<String, LanguageStats> = BTreeMap::new();
 
     for m in modules {
         *language_distribution.entry(m.language.clone()).or_insert(0) += m.files.len();

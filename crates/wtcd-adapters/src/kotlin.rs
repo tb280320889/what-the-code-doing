@@ -280,8 +280,8 @@ fn extract_kotlin_signature(node: Node, source: &str) -> (Vec<Parameter>, String
 fn extract_imports(source: &str, out: &mut Vec<DependencyEdge>) {
     for line in source.lines() {
         let trimmed = line.trim();
-        if trimmed.starts_with("import ") {
-            let import_path = trimmed[7..].trim();
+        if let Some(import_path) = trimmed.strip_prefix("import ") {
+            let import_path = import_path.trim();
             let kind = if import_path.contains(".*") {
                 ImportKind::Namespace
             } else {
@@ -301,17 +301,14 @@ fn extract_side_effects(root: &Node, source: &str, out: &mut Vec<SideEffect>) {
 }
 
 fn extract_side_effects_node(node: Node, source: &str, out: &mut Vec<SideEffect>) {
-    match node.kind() {
-        "annotation" => {
-            let line = node.start_position().row as u32 + 1;
-            let text = node.utf8_text(source.as_bytes()).unwrap_or("");
-            out.push(SideEffect {
-                kind: SideEffectKind::Log,
-                target: format!("{META_PREFIX}annotation:{text}"),
-                line,
-            });
-        }
-        _ => {}
+    if node.kind() == "annotation" {
+        let line = node.start_position().row as u32 + 1;
+        let text = node.utf8_text(source.as_bytes()).unwrap_or("");
+        out.push(SideEffect {
+            kind: SideEffectKind::Log,
+            target: format!("{META_PREFIX}annotation:{text}"),
+            line,
+        });
     }
 
     for child in node.children(&mut node.walk()) {

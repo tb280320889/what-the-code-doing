@@ -104,8 +104,7 @@ pub async fn handle_run(
             summary,
         };
 
-        serde_json::to_string_pretty(&output)
-            .map_err(|e| format!("Serialization error: {}", e))
+        serde_json::to_string_pretty(&output).map_err(|e| format!("Serialization error: {}", e))
     })
     .await
     .map_err(|e| rmcp::ErrorData::internal_error(e.to_string(), None))?;
