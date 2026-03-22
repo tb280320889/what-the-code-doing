@@ -20,61 +20,49 @@ All 38 v1 requirements satisfied in Milestone v1.0. See v1.0-MILESTONE-AUDIT.md.
 
 - [x] All 32 remaining v1 requirements (SCOP-01~03, LANG-01~06, MIRR-01~05, FP-01~03, DRFT-01~04, GATE-01~05, RTIX-01~03, INCR-01~03)
 
-## v0.1.1 Requirements
+## v0.1.1 Requirements (Validated)
 
-v0.1.1 里程碑需求：扩展多语言支持（Python, Go）并新增模块级聚合和知识层。
+All 40 v0.1.1 requirements satisfied in Milestone v0.1.1. See `.planning/v0.1.1-MILESTONE-AUDIT.md`.
 
-### Python Adapter
+## v0.2.0 Requirements
 
-- [x] **PY-01**: User can parse Python files using tree-sitter-python with error tolerance (confidence: low on parse failure)
-- [x] **PY-02**: User can extract function definitions (def name(params) -> return_type) with type annotations
-- [x] **PY-03**: User can extract class definitions (class Name(Base):) with base class info
-- [x] **PY-04**: User can extract import statements: import X, from X import Y, relative imports (from .X import Y)
-- [x] **PY-05**: User can detect decorators (@decorator) on functions and classes as metadata
-- [x] **PY-06**: User can handle __init__.py files as package markers
-- [x] **PY-07**: User can parse __all__ declarations for explicit export filtering
-- [x] **PY-08**: User can identify @property, @staticmethod, @classmethod method types
-- [x] **PY-09**: User can detect dataclass and Pydantic BaseModel patterns
+v0.2.0 里程碑需求：新增 Rust、Dart、Java、Kotlin、Swift、C++、C#、C、Zig 九种语言完整适配，并确保聚合/路由/门禁链路一致可靠。
 
-### Go Adapter
+### Adapter Coverage
 
-- [x] **GO-01**: User can parse Go files using tree-sitter-go with error tolerance (confidence: low on parse failure)
-- [x] **GO-02**: User can extract function declarations (func Name(params) returns)
-- [x] **GO-03**: User can extract method declarations with receivers (func (T) Method())
-- [x] **GO-04**: User can extract type declarations: struct, interface, type alias
-- [x] **GO-05**: User can extract import statements (import "pkg", import alias "path")
-- [x] **GO-06**: User can extract constant and variable declarations
-- [x] **GO-07**: User can determine export visibility (uppercase = exported, lowercase = private)
-- [x] **GO-08**: User can extract struct fields with types and tags
-- [x] **GO-09**: User can extract interface method signatures
-- [x] **GO-10**: User can identify embedded structs (type T struct { Base })
-- [x] **GO-11**: User can detect goroutine and channel patterns as side effects
-- [x] **GO-12**: User can detect compiler directives (//go:embed, //go:generate)
+- [ ] **ADPT-01**: User can parse Rust files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-02**: User can parse Dart files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-03**: User can parse Java files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-04**: User can parse Kotlin files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-05**: User can parse Swift files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-06**: User can parse C++ files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-07**: User can parse C# files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-08**: User can parse C files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-09**: User can parse Zig files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-10**: User can see scanner coverage for all new language extensions so files are routed to the correct adapters
+- [ ] **ADPT-11**: User can rely on adapter registry auto-selection so no new CLI command is needed for new languages
+- [ ] **ADPT-12**: User can trust each new adapter via fixtures + unit tests + integration tests for normal/broken syntax and representative language constructs
 
-### Module Aggregation
+### Aggregation Consistency
 
-- [x] **MOD-01**: User can aggregate exports from all files in a module into module-level summary
-- [x] **MOD-02**: User can aggregate dependencies from all files in a module
-- [x] **MOD-03**: User can generate module-level responsibility description from file mirrors
-- [x] **MOD-04**: User can list all files belonging to a module
-- [x] **MOD-05**: User can aggregate side effects from all files in a module
-- [x] **MOD-06**: User can build intra-module dependency graph from import resolution
-- [x] **MOD-07**: User can auto-detect module boundaries per language (Python: __init__.py, Go: package, TS: directory)
-- [x] **MOD-08**: User can calculate module-level semantic fingerprint (hash of sorted child fingerprints)
-- [x] **MOD-09**: User can detect module-level drift via C0-C3 rollup from file-level drift
-- [x] **MOD-10**: User can calculate fan-in/fan-out statistics per module
+- [ ] **CONS-01**: User can get language-aware import normalization in depgraph so incremental impact expansion is accurate across all supported languages
+- [ ] **CONS-02**: User can see module aggregation results stay semantically consistent across TS/JS/Python/Go and the 9 new languages
+- [ ] **CONS-03**: User can get stable drift classification by using explicit analysis context for conditional compilation/preprocessor-sensitive languages
+- [ ] **CONS-04**: User can see generated or uncertain symbols explicitly marked (with confidence impact) instead of silently treated as certain facts
 
-### Knowledge Layer
+### Consumer Quality (Route/Knowledge)
 
-- [x] **KNOW-01**: User can generate repository overview document (language distribution, module list, entry points)
-- [x] **KNOW-02**: User can generate module dependency graph in Mermaid format
-- [x] **KNOW-03**: User can generate global export index across all modules
-- [x] **KNOW-04**: User can generate language and file statistics
-- [x] **KNOW-05**: User can perform semantic clustering via community detection algorithm
-- [x] **KNOW-06**: User can generate change hotspot map from drift history
-- [x] **KNOW-07**: User can calculate token compression ratio (mirror_tokens / source_tokens)
-- [x] **KNOW-08**: User can suggest Agent read paths based on dependency graph + routing index
-- [x] **KNOW-09**: User can generate ADR skeleton from C2/C3 drift reports
+- [ ] **ROUT-01**: User can query routes with language and confidence signals to reduce false-positive candidate files
+- [ ] **ROUT-02**: User can inspect a language capability matrix in knowledge output to understand per-language extraction coverage
+- [ ] **ROUT-03**: User can see low-confidence and generated/uncertain areas explicitly surfaced in knowledge docs
+- [ ] **ROUT-04**: User can trust route quality after adapter expansion via regression checks on representative multi-language repositories
+
+### Stability Gates
+
+- [ ] **STAB-01**: User can rely on CI matrix checks that validate `run/check/route` across all 9 new languages
+- [ ] **STAB-02**: User can rely on performance budgets for parsing and incremental updates with measurable thresholds
+- [ ] **STAB-03**: User can rely on parser/grammar version locks plus upgrade playbook to avoid uncontrolled ABI drift
+- [ ] **STAB-04**: User can trust pipeline integrity because tests catch scanner-extension and adapter-registry mismatch before merge
 
 ## Future Requirements
 
@@ -91,6 +79,12 @@ Deferred to future release. Tracked but not in current roadmap.
 - **ADV-02**: Generic constraint deep analysis
 - **ADV-03**: Complete UML diagram generation
 
+### Polyglot Advanced
+
+- **POLY-01**: Cross-language deep type resolution (compiler/LSP assisted) for high-confidence symbol binding
+- **POLY-02**: Full macro/template/preprocessor expansion modeling for Rust/C/C++ level semantic depth
+- **POLY-03**: High-precision FFI and interop edge modeling (JNI/PInvoke/extern/cgo-style patterns)
+
 ## Out of Scope
 
 Explicitly excluded. Documented to prevent scope creep.
@@ -102,6 +96,8 @@ Explicitly excluded. Documented to prevent scope creep.
 | Running Python/Go code | Security risk, violates "pure parsing" principle |
 | Dynamic import analysis | Variables cannot be statically resolved |
 | Type inference | Full type checker domain (mypy/pyright) |
+| Compiler-level semantic binding in v0.2.0 | Too expensive for this milestone; defer to POLY-01 |
+| Full macro/template/preprocessor expansion in v0.2.0 | High complexity and toolchain coupling; defer to POLY-02 |
 | Web UI | v1 CLI-only, no web interface |
 | Real-time background service | CLI on-demand execution only |
 
@@ -111,16 +107,36 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PY-01 ~ PY-09 | Phase 5 | Complete |
-| GO-01 ~ GO-12 | Phase 6 | Complete |
-| MOD-01 ~ MOD-10 | Phase 7 | Complete |
-| KNOW-01 ~ KNOW-09 | Phase 8 | Complete |
+| ADPT-01 | TBD | Pending |
+| ADPT-02 | TBD | Pending |
+| ADPT-03 | TBD | Pending |
+| ADPT-04 | TBD | Pending |
+| ADPT-05 | TBD | Pending |
+| ADPT-06 | TBD | Pending |
+| ADPT-07 | TBD | Pending |
+| ADPT-08 | TBD | Pending |
+| ADPT-09 | TBD | Pending |
+| ADPT-10 | TBD | Pending |
+| ADPT-11 | TBD | Pending |
+| ADPT-12 | TBD | Pending |
+| CONS-01 | TBD | Pending |
+| CONS-02 | TBD | Pending |
+| CONS-03 | TBD | Pending |
+| CONS-04 | TBD | Pending |
+| ROUT-01 | TBD | Pending |
+| ROUT-02 | TBD | Pending |
+| ROUT-03 | TBD | Pending |
+| ROUT-04 | TBD | Pending |
+| STAB-01 | TBD | Pending |
+| STAB-02 | TBD | Pending |
+| STAB-03 | TBD | Pending |
+| STAB-04 | TBD | Pending |
 
 **Coverage:**
-- v0.1.1 requirements: 40 total
-- Mapped to phases: 40
-- Unmapped: 0 ✓
+- v0.2.0 requirements: 24 total
+- Mapped to phases: 0
+- Unmapped: 24 ⚠️
 
 ---
 *Requirements defined: 2026-03-21*
-*Last updated: 2026-03-21 after v0.1.1 milestone scoping*
+*Last updated: 2026-03-22 after v0.2.0 requirement definition draft*
