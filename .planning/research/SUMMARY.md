@@ -1,185 +1,160 @@
 # Project Research Summary
 
-**Project:** ANRSM v0.1.1 — Multi-Language & Knowledge Layer
-**Domain:** Rust CLI for code repository semantic mirror generation
-**Researched:** 2026-03-21
-**Confidence:** HIGH
+**Project:** WTCD v0.2.0 Polyglot Adapters（9 语言扩展）
+**Domain:** Rust CLI 代码语义提取与跨语言适配器体系
+**Researched:** 2026-03-22
+**Confidence:** MEDIUM-HIGH
 
 ## Executive Summary
 
-ANRSM 是一个面向 Agent 的代码语义镜像工具，通过 tree-sitter 解析源码生成结构化镜像，供 AI Agent 高效消费。当前版本仅支持 TypeScript/JavaScript，v0.1.1 里程碑的核心目标是扩展到 Python 和 Go 语言，并新增模块级聚合和知识层两个抽象层级，形成**文件镜像 → 模块镜像 → 知识层**的三层架构。
+这是一个“以 Rust 单二进制为约束”的多语言代码语义提取系统扩展项目：在不改 CLI 交互模型（`run/check/route`）的前提下，把 Rust、Dart、Java、Kotlin、Swift、C++、C#、C、Zig 接入现有 adapter/registry 管线。研究结论非常一致：行业里这类能力在首版应优先走 **tree-sitter + 统一语义契约**，先保证可扫描、可解析、可提取、可回归，而不是一步跳到编译器级类型求解。
 
-推荐方案是**纯增量式扩展**：Python 和 Go 适配器通过实现已有的 `LanguageAdapter` trait 加入现有流水线，无需修改核心架构。模块聚合在文件镜像之上新增中间层，知识层作为最顶层消费者从模块镜像编译仓库级文档。整个方案零新增 LLM 依赖，tree-sitter 生态通过 `tree-sitter-language ^0.1` 桥接层确保版本兼容。构建顺序受硬依赖约束：适配器先行（并行开发），模块聚合次之，知识层最后。
+推荐路径是“先打通再加深”：以 `tree-sitter@0.26.7` + 各语言 grammar crate 为核心，沿用现有 `LanguageAdapter` 模式扩展 9 个适配器，稳定产出 `exports/imports/signatures/side_effects + confidence` 四元组，随后修正跨语言 depgraph 归一与聚合噪声。这样能在 v0.2.0 内完成高价值覆盖，同时保持后续向深语义演进的空间。
 
-最大风险来自三个方向：**tree-sitter 版本冲突**（多语法库编译时的链接器符号碰撞）、**Python 缩进解析边缘情况**（外部 C scanner 的复杂性）、以及**知识层生成无用的泛化内容**（只有语法结构没有语义意图）。预防策略已在 PITFALLS.md 中详细记录，核心原则是"只生成可验证的事实，不生成无法验证的 why"。
+主要风险不在“能否 parse”，而在“语义错配导致下游误判”：可见性规则跨语言不一致、条件编译导致指纹抖动、宏/生成代码造成静默漏提取、C/C++ 头文件语言歧义。缓解策略是：前置契约（visibility/context/confidence）、language-aware import normalization、generated/uncertain 明确标注、以及每语言全链路 E2E 回归门禁。
 
 ## Key Findings
 
 ### Recommended Stack
 
-详见 [STACK.md](./STACK.md)。
+本次技术栈建议高度聚焦于“最小架构改动 + 最大语言覆盖”：保持现有 `wtcd-core::LanguageAdapter + AdapterRegistry` 主干不变，在 workspace 统一管理 tree-sitter runtime 与 9 个语法库版本，避免隐式漂移。对 v0.2.0 来说，这是风险最低且可验证性最强的路径。
 
 **Core technologies:**
-- **tree-sitter-python 0.25.0**: Python 语法解析 — 最新稳定版，与项目现有 tree-sitter 0.26.7 通过 `tree-sitter-language ^0.1` 桥接兼容，5.2M+ 下载验证
-- **tree-sitter-go 0.25.0**: Go 语法解析 — 同一桥接层，3.8M+ 下载，Go AST 结构清晰（function_declaration vs method_declaration）
-- **tree-sitter-md 0.5.3** (optional): Markdown 结构化解析 — 用于知识层 ADR/文档提取，默认不启用，用户可通过 feature flag 按需开启
-- **pulldown-cmark 0.13** (已有): 知识层默认 Markdown 解析方案 — 零新依赖，提取标题/段落/前端数据足够
-- **yaml_serde 0.10** (已有): YAML Front Matter 解析 — 复用于镜像头部和知识层
+- `tree-sitter@0.26.7`：统一增量解析 runtime — 具备显式 ABI 兼容校验，便于可诊断失败。
+- `tree-sitter-language@0.1.7`：grammar 与 runtime 的桥接层 — 降低语法库版本耦合风险。
+- `LanguageAdapter + AdapterRegistry`（现有）：统一语言接入边界 — 无需重构 CLI 主流程，仅扩展模块与注册。
 
-**关键兼容性决策：** tree-sitter 0.23+ 通过 `tree-sitter-language ^0.1` 桥接 crate 统一版本，语法库不再直接依赖特定 tree-sitter 版本。项目已验证此模式（tree-sitter-typescript 0.23 + tree-sitter 0.26 正常工作），Python 和 Go 适配器遵循相同模式。
-
-**不需要新增的依赖：** rustpython-parser（过重）、syn（不适用）、pest/nom（tree-sitter 已覆盖）、rayon（当前性能足够）、walkdir（已有 ignore crate）。
+**关键版本要求（必须锁定）**
+- Runtime/Bridge：`tree-sitter@0.26.7`、`tree-sitter-language@0.1.7`
+- Grammar：`rust 0.24.1`、`dart 0.1.0`、`java 0.23.5`、`kotlin-ng 1.1.0`、`swift 0.7.1`、`cpp 0.23.4`、`c-sharp 0.23.1`、`c 0.24.1`、`zig 1.1.2`
 
 ### Expected Features
 
-详见 [FEATURES.md](./FEATURES.md)。
+v0.2.0 的可交付定义清晰：不是“语义最深”，而是“跨 9 语言的可用一致性”。先把用户默认期望的能力做完整，再把语义等深作为 v0.2.x/0.3+ 的增强路线。
 
 **Must have (table stakes):**
-- **Python 适配器** — 函数/类定义提取、import 语句（含相对导入）、装饰器检测、类型注解提取、语法错误容忍、`__init__.py` 处理
-- **Go 适配器** — 函数/方法声明提取、struct/interface/type 提取、import 语句、常量/变量提取、首字母大小写可见性判断、语法错误容忍
-- **模块级镜像聚合** — 模块级导出汇总、依赖汇总、职责描述、文件列表索引、副作用汇总
-- **知识层文档** — 仓库总览、模块关系图（Mermaid）、导出索引、语言/文件统计
+- 扩展名扫描命中 + AdapterRegistry 正确路由。
+- AST 解析 + confidence 分级（错误容忍但可降级）。
+- 四类事实稳定输出：`exports/imports/signatures/side_effects`。
+- 每语言 fixtures + 单测 + `run/check/route` 集成回归。
+- CLI/MCP 无新增心智负担（原命令直接可用）。
 
 **Should have (competitive):**
-- Python: `__all__` 解析、相对导入解析、`@property`/`@staticmethod` 方法类型识别、dataclass/Pydantic 检测
-- Go: Method Receiver 提取、struct 字段提取、interface 方法列表、嵌入式结构体识别、goroutine/channel 检测、`//go:embed` 指令
-- 模块: 模块内依赖图、模块边界自动检测、模块级指纹、模块级漂移检测、扇入/扇出统计
-- 知识层: 语义聚类（社区发现）、变更热点图、Token 压缩报告、Agent 读取路径建议、ADR 自动骨架
+- 跨语言语义归一层（统一 ExportKind 语义映射）。
+- 语言特有元信息标签化输出（不污染核心 schema）。
+- 能力矩阵（每语言支持项）与 broken-fixture 韧性基准。
 
-**Defer (v2+):**
-- CGo 分析（复杂度过高）
-- 泛型约束深度分析
-- 跨语言类型引用关联（protobuf/OpenAPI 桥接）
-- LLM 生成自由文本总结（违反 A4 公理）
-- 完整 UML 图生成
-- Web UI（v1 不做）
+**Defer (v2+ / v0.3+):**
+- 编译器级类型求解与完整符号解析。
+- 宏/模板/预处理完整展开分析。
+- 深度 FFI/interop 边精准建模（先规则化起步）。
 
 ### Architecture Approach
 
-详见 [ARCHITECTURE.md](./ARCHITECTURE.md)。
-
-现有流水线 `scan → parse → mirror → index → diff/gate` 设计良好，四个新特性均能干净融入。关键架构决策：
-
-1. **Python & Go 适配器** — 纯增量，扩展 `wtcd-adapters` crate（单 crate 多模块），每个语言一个 `py.rs`/`go.rs` 文件实现 `LanguageAdapter` trait
-2. **模块级聚合** — 文件镜像与路由索引之间的新中间层，新增 `ModuleResult` 类型、`group_by_module_id()` 和 `aggregate_module()` 函数
-3. **知识层** — `wtcd-mirror::knowledge` 模块，三阶段流水线：Collect（读取模块镜像+索引）→ Analyze（依赖图、风险聚合）→ Generate（结构化文档）
-
-**输出目录结构：**
-```
-mirror/
-├── file/          # 已有 — 文件级镜像
-├── module/        # 新增 — 模块级镜像
-├── knowledge/     # 新增 — 知识层文档
-└── routing_index.json  # 增强（含模块条目）
-```
+架构建议是“保守演进而非重构”：新增 9 个 `wtcd-adapters/src/<lang>.rs`，在 `lib.rs` 集中注册；扩展 `wtcd-scope::SUPPORTED_EXTENSIONS`；在 `wtcd-core` 修正跨语言 depgraph（从 TS-only 变为 language-aware）；可选但强烈建议在 `FileResult` 增加 `language` 字段，避免下游猜测。核心模式为 Adapter-per-language + Progressive extraction contract，先保证四元组稳定输出，再逐语言提精度。
 
 **Major components:**
-1. `wtcd-adapters` — 新增 `PyAdapter` 和 `GoAdapter`，注册到 `register_all_adapters()`
-2. `wtcd-core::types` — 扩展 `ExportKind`（Module, Decorator, Method, Struct）、新增 `ModuleResult`
-3. `wtcd-mirror` — 新增模块镜像生成 + `knowledge` 子模块
-4. `wtcd-scope` — 扩展 `SUPPORTED_EXTENSIONS` 加入 `"py"`, `"pyi"`, `"go"`
-5. `wtcd-cli` — 流水线插入模块聚合和知识生成步骤
+1. `wtcd-scope::scanner` — 负责文件进入管线的扩展名白名单筛选。
+2. `wtcd-adapters`（LanguageAdapter 实现集）— 负责每语言 parse 与语义抽取。
+3. `wtcd-core::depgraph/index` — 负责增量影响面、路由检索与下游消费一致性。
 
 ### Critical Pitfalls
 
-详见 [PITFALLS.md](./PITFALLS.md)。v0.1.1 最关键的 5 个陷阱：
-
-1. **tree-sitter 版本锁冲突 (EXT-C1)** — 多语法库编译时产生链接器符号碰撞。**预防：** 所有 tree-sitter crate 锁定相同 minor 版本，CI 编译集成测试
-2. **Python 缩进解析边缘情况 (EXT-C2)** — Python 外部 C scanner 在混合 tab/space、dedent 错误恢复时产生异常。**预防：** 用 Django/Flask/FastAPI 等真实仓库测试，ERROR 节点优雅降级为 `confidence: low`
-3. **Go 包语义不匹配 (EXT-C3)** — Go 的 package 声明、`internal/` 可见性、首字母大小写导出与 TS/Python 模式完全不同。**预防：** 先解析 go.mod，按 package 声明分组（非目录），过滤导出
-4. **知识层生成泛化无用内容 (EXT-C5)** — 只有语法结构没有语义意图，生成的文档"比没有更糟"。**预防：** 只生成可验证事实（exports、dependencies、structure），绝不生成 "why"
-5. **镜像成为第二真相源 (C5)** — 工程师先改镜像再改代码。**预防：** 每个镜像必须有 `source_artifacts` 字段，门禁阻断"只改镜像不改源码"的提交
+1. **可见性/导出语义被过度统一** — 在适配器层引入语言可见性模型，聚合层只消费归一化导出集合。
+2. **条件编译与预处理引发假漂移** — 指纹输入绑定 `analysis_context`，定义单一门禁基准上下文。
+3. **宏/生成机制导致静默漏提取** — 区分 `explicit_symbols` 与 `generated_or_uncertain_symbols`，并强制降级置信度。
+4. **C/C++ 头文件识别歧义** — 实施“扩展名+邻接编译单元+配置覆盖”三级识别，支持 `language_overrides`。
+5. **只测 adapter 不测全链路** — 每语言必须做 `parse→mirror→aggregate→route→drift` E2E 快照回归。
 
 ## Implications for Roadmap
 
 Based on research, suggested phase structure:
 
-### Phase 1: Python Language Adapter
-**Rationale:** Python 适配器与 Go 适配器完全独立，可并行开发。Python 社区更大，tree-sitter-python 下载量更高（5.2M vs 3.8M），作为先行验证 tree-sitter 多语法集成模式。同时验证 EXT-C1（版本锁冲突）的预防策略。
-**Delivers:** `PyAdapter` 实现 `LanguageAdapter` trait，Python 文件解析产出 `FileResult`，扩展 `ExportKind` 和 `SUPPORTED_EXTENSIONS`
-**Addresses:** FEATURES.md §1 Python 适配器（所有 table stakes）
-**Avoids:** EXT-C1（建立版本锁定模式）、EXT-C2（处理缩进边缘情况）、PITFALLS m2（避免适配器过度工程化）
-**Risk:** MEDIUM — Python 装饰器包裹定义（`decorated_definition`）需要额外处理
+### Phase 1: 基线与契约冻结（Stack + Contract Baseline）
+**Rationale:** 先锁 runtime/grammar/置信度/可见性契约，避免后续并行开发返工。  
+**Delivers:** 版本锁（含 parser-lock 策略）、扩展名清单、统一提取契约、错误与置信度规范。  
+**Addresses:** Table stakes 的“扫描命中”“confidence 分级”。  
+**Avoids:** 可见性错配、parser 漂移、低置信策略缺位。
 
-### Phase 2: Go Language Adapter
-**Rationale:** 与 Phase 1 并行或紧随其后，复用 Phase 1 建立的 tree-sitter 集成模式。Go 适配器的独特挑战在于包语义（EXT-C3），需要独立验证。
-**Delivers:** `GoAdapter` 实现 `LanguageAdapter` trait，Go 文件解析产出 `FileResult`，Go 特殊处理（首字母大写导出、init() 标记、method vs function）
-**Addresses:** FEATURES.md §2 Go 适配器（所有 table stakes）
-**Avoids:** EXT-C3（Go 包语义正确处理）、EXT-M1（cgo 构建验证）、PITFALLS m2
-**Risk:** MEDIUM — `method_declaration` vs `function_declaration` 的 receiver 提取需要验证
+### Phase 2: 9 语言适配器并行实现（Adapter Batches）
+**Rationale:** 依赖已冻结契约后可并行；按语言族分批能降低上下文切换。  
+**Delivers:** 9 个新 adapter + 注册接线 + 每语言最小完整 fixture/单测。  
+**Uses:** `tree-sitter@0.26.7` 与 9 个 grammar crate。  
+**Implements:** `wtcd-adapters` 新模块、`scanner` 白名单扩展。  
+**Avoids:** “只加 adapter 不改 scanner”、C/C++ 识别歧义、JVM 包边界失真。
 
-### Phase 3: Module-Level Mirror Aggregation
-**Rationale:** 依赖 Phase 1+2 完成（需要多语言 FileResults 验证聚合逻辑）。这是架构上最大的新增层，需要新类型、新模板、新流水线步骤。
-**Delivers:** `ModuleResult` 类型、`group_by_module_id()`/`aggregate_module()` 聚合逻辑、`ModuleMirrorHeader`/Body、`mirror/module/*.md` 输出、增强 routing_index
-**Addresses:** FEATURES.md §3 模块级聚合（所有 table stakes + 模块内依赖图、模块级指纹等 differentiators）
-**Avoids:** EXT-C4（模块定义歧义 — 需要 per-adapter boundary function）、EXT-M4（聚合大小爆炸 — 硬限制 2-3KB）、PITFALLS C6（增量更新）
-**Risk:** HIGH — 模块边界定义（Python 包 vs Go package vs TS 目录）有歧义，需要设计决策
+### Phase 3: 跨语言聚合一致性（Depgraph & Aggregation Hardening）
+**Rationale:** 适配器可用后，必须先修下游一致性，否则 run/check/route 结果不可信。  
+**Delivers:** language-aware import normalization、（推荐）`FileResult.language`、聚合边界修正。  
+**Addresses:** Table stakes 的依赖边质量与签名可检索性。  
+**Avoids:** TS-only depgraph 误扩散/漏扩散、跨语言误聚合、假漂移。
 
-### Phase 4: Knowledge Layer
-**Rationale:** 最后构建，依赖 Phase 3 的模块镜像和增强路由索引。知识层是纯派生品，风险在于内容质量而非技术实现。
-**Delivers:** `wtcd-mirror::knowledge` 模块、`KnowledgeHeader` 类型、`mirror/knowledge/*.md` 输出（architecture.md、api-surface.md、risk-map.md）、`anrsm.yaml` 扩展 `knowledge:` 配置块
-**Addresses:** FEATURES.md §4 知识层（所有 table stakes）
-**Avoids:** EXT-C5（只生成可验证事实）、PITFALLS M4（不提前平台化）、PITFALLS C5（知识层从镜像编译，不允许独立事实）
-**Risk:** MEDIUM — 输出格式和内容深度需要与实际 Agent 消费需求对齐
+### Phase 4: Route/Knowledge 语义质量收口（Consumer Reliability）
+**Rationale:** 让“可解析”升级为“可决策”，确保 Agent 端读取质量。  
+**Delivers:** route 索引增强（language/namespace/confidence 维度）、知识层低置信标注、generated/uncertain 展示。  
+**Addresses:** Differentiators（语义归一、元信息标签化、能力矩阵雏形）。  
+**Avoids:** 低置信事实被当成确定结论、route 命中面扩大但精度下降。
+
+### Phase 5: CI 门禁与发布稳定化（Regression & Performance Gates）
+**Rationale:** 新增 9 语言后，质量问题主要在回归与性能，不在功能点本身。  
+**Delivers:** 多语言混仓 E2E 回归矩阵、跨平台漂移阈值、性能预算与超时降级、升级迁移流程。  
+**Addresses:** Table stakes 的“可持续迭代”与“不破坏既有链路”。  
+**Avoids:** parser 升级全红、噪声漂移、性能断崖、仅 unit 无 E2E。
 
 ### Phase Ordering Rationale
 
-- **适配器先行（Phase 1-2 并行）：** 产出 FileResult 供所有后续消费，无下游依赖，纯增量
-- **模块聚合其次（Phase 3）：** 依赖多语言 FileResults 验证，是知识层的硬依赖
-- **知识层最后（Phase 4）：** 纯派生品，依赖模块镜像 + 增强路由索引，提前做会产生"泛化无用内容"陷阱
-- **此顺序遵循 PITFALLS M4 的警告：** 严格遵循阶段顺序，先适配器 → 镜像 → 聚合 → 知识
+- 先“契约和版本”再“并行实现”，是避免 9 语言并发返工的唯一低风险顺序。
+- 适配器完成后必须先做 depgraph/聚合修正，再做 route/knowledge，否则下游优化建立在错误输入上。
+- 把 CI/性能门禁放在最后收口，但其规范（基准上下文、置信度策略）需在 Phase 1 前置定义。
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
-- **Phase 3 (Module Aggregation):** 模块边界定义策略需要设计决策 — Python `__init__.py` vs Go `package` vs TS 目录的统一方案。需要 ADR。
-- **Phase 4 (Knowledge Layer):** 输出内容深度和格式需要与 Agent 实际消费需求对齐。可能需要 `/gsd-research-phase` 验证最佳实践。
+- **Phase 3:** 跨语言 import normalization 规则复杂，需补充语言族路径语义与边界用例研究。
+- **Phase 4:** 语义归一与元标签 schema 设计涉及消费者兼容性，建议做一次专门 schema 评审。
+- **Phase 5:** 性能预算与跨平台漂移阈值需要真实仓库样本基准，不宜凭经验拍值。
 
 Phases with standard patterns (skip research-phase):
-- **Phase 1 (Python Adapter):** tree-sitter-python 成熟，TS 适配器可作模板，模式明确
-- **Phase 2 (Go Adapter):** tree-sitter-go 成熟，同上
+- **Phase 1:** 版本锁定、置信度分层、契约冻结均为成熟工程模式。
+- **Phase 2:** Adapter-per-language + fixtures 回归模式在现有 ts/py/go 已被验证。
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | tree-sitter 版本兼容性已验证（tree-sitter-language 桥接 + 项目已有 TS 适配器），所有依赖在 crates.io 可用且下载量验证 |
-| Features | HIGH | Python/Go 的 AST 节点类型从 node-types.json 验证，tree-sitter 生态成熟，映射表完整 |
-| Architecture | HIGH | 现有流水线设计良好，trait-based 扩展模式清晰，集成点明确，无架构重构需求 |
-| Pitfalls | HIGH | 项目自身反模式文档 + 外部研究（tree-sitter issues、DevTool 采用率、CI 门禁模式）高度一致 |
+| Stack | HIGH | runtime 与核心接入路径有官方文档与现有仓库模式双重支撑；仅个别 grammar 活跃度需编译实证。 |
+| Features | MEDIUM-HIGH | P1/P2 边界清晰；竞品外部证据因缺少 Tavily API 未做深检索。 |
+| Architecture | HIGH | 基于现有代码结构与明确改动点，依赖关系和构建顺序可执行性强。 |
+| Pitfalls | HIGH | 风险点与预防策略具备语言规范与 tree-sitter 官方依据，且与现有 pipeline 痛点高度对齐。 |
 
-**Overall confidence:** HIGH
+**Overall confidence:** MEDIUM-HIGH
 
 ### Gaps to Address
 
-- **模块边界配置 vs 自动发现：** Python `__init__.py` 是自然边界，Go `package` 声明是自然边界，但 TS/JS 的目录约定需要设计决策。**处理方式：** Phase 3 开始时写 ADR，建议"自动发现 + anrsm.yaml 可选覆盖"
-- **模块镜像指纹计算：** 聚合文件指纹 vs 重新计算语义指纹。**处理方式：** 建议聚合（`hash(sorted(child_fingerprints))`），确定性好
-- **知识层是否需要独立指纹：** 完全由下层派生，建议 v0.1.1 不做独立指纹
-- **Python `__all__` 语义：** 有 `__all__` 时只提取列表中的符号，无则全量导出。**处理方式：** Phase 1 实现时验证
-- **Cross-language type reference gap:** 单仓 TS+Python+Go 中跨语言类型引用（protobuf/OpenAPI）当前无法关联。**处理方式：** v0.1.1 不解决，v2 评估
+- **Kotlin grammar 选型实证缺口：** `tree-sitter-kotlin-ng@1.1.0` 需在仓库 CI 做编译+fixture smoke 才能最终定版。
+- **跨平台漂移阈值尚未量化：** 需在 Linux/macOS 基准仓运行样本后确定门禁阈值。
+- **C/C++ 头文件判定策略未工程化：** 需明确 `language_overrides` 配置格式与默认优先级。
+- **竞品对标证据不足：** 因外部检索受限，后续可补公开案例数据增强 roadmap 说服力。
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- crates.io: `tree-sitter-python` 0.25.0, `tree-sitter-go` 0.25.0, `tree-sitter-md` 0.5.3, `tree-sitter` 0.26.7 — 版本、依赖、下载量
-- Context7: `/tree-sitter/tree-sitter-python`, `/tree-sitter/tree-sitter-go` — AST 节点类型、语法结构
-- GitHub: tree-sitter/tree-sitter#3069 — tree-sitter-language crate 架构
-- GitHub: tree-sitter/tree-sitter-python/node-types.json — Python 完整节点类型
-- GitHub: tree-sitter/tree-sitter-go/test/corpus — Go AST 结构示例
-- 现有代码库: `wtcd-core::adapter`, `wtcd-adapters::ts`, `wtcd-mirror::template`, `wtcd-cli::commands::run`
+- Context7 `/tree-sitter/tree-sitter` — Parser API、language ABI 兼容、ERROR/MISSING 与查询机制
+- 官方文档 `https://docs.rs/tree-sitter/latest/tree_sitter/struct.Parser.html` — `set_language`/`parse` 语义
+- 官方文档 `https://tree-sitter.github.io/tree-sitter/using-parsers/` — parser 使用基线
+- 项目源码：
+  - `crates/wtcd-core/src/{adapter.rs,types.rs,depgraph.rs}`
+  - `crates/wtcd-adapters/src/{ts.rs,py.rs,go.rs}`
+  - `crates/wtcd-scope/src/scanner.rs`
+  - `crates/wtcd-cli/src/commands/{run.rs,check.rs}`
 
 ### Secondary (MEDIUM confidence)
-- tree-sitter issues: #4209（链接器符号冲突）、#5421（Go binding include path）、#4001（增量解析不一致）、#322（解析器无限循环）
-- DevTools 采用率研究 — 95% 放弃率，time-to-first-value 关键
-- AI Documentation Debt — 泛化内容、stale-on-arrival 模式
-- CI 门禁失败模式 — 误报导致绕过
-- AutomaDocs / Context+ MCP / Knowledge as Code — 架构参考模式
+- crates 元数据与 docs：`tree-sitter-rust/dart/java/kotlin-ng/swift/cpp/c-sharp/c/zig` 版本可用性
+- 各语言规范文档（Rust/Dart/Java/Kotlin/Swift/C/C++/C#/Zig）用于 pitfalls 约束校验
 
 ### Tertiary (LOW confidence)
-- WebSearch: "tree-sitter 0.26 compatible tree-sitter-python 0.25" — ABI 兼容性验证
-- Cross-language type reference gap — v2 问题，当前无成熟方案
+- 竞品横向对比的抽象结论（未完成外部检索量化，需后续补证）
 
 ---
-
-*Research completed: 2026-03-21*
+*Research completed: 2026-03-22*
 *Ready for roadmap: yes*
