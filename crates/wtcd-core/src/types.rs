@@ -98,6 +98,32 @@ pub struct FileResult {
     pub error_message: Option<String>,
 }
 
+/// Module-level aggregated result (Phase 7)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModuleResult {
+    pub module_id: String,
+    pub language: String,
+    pub files: Vec<String>,
+    pub exports: Vec<String>,
+    pub dependencies: Vec<String>,
+    pub side_effects: Vec<String>,
+    pub responsibility: String,
+    pub semantic_fingerprint: String,
+    pub fan_in: usize,
+    pub fan_out: usize,
+    pub drift_level: String,
+}
+
+/// Repository-level knowledge output (Phase 8)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KnowledgeResult {
+    pub module_count: usize,
+    pub language_distribution: std::collections::BTreeMap<String, usize>,
+    pub total_files: usize,
+    pub total_exports: usize,
+    pub token_compression_ratio: f64,
+}
+
 /// Run-level summary statistics (D-07)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RunSummary {

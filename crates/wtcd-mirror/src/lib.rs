@@ -1,6 +1,8 @@
 pub mod config;
 pub mod fingerprint;
 pub mod io;
+pub mod knowledge;
+pub mod module;
 pub mod template;
 pub mod types;
 
