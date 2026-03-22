@@ -23,6 +23,8 @@ scope:
 
 mirror:
   output_dir: mirror/file
+  module_output_dir: mirror/module
+  knowledge_output_dir: mirror/knowledge
   fp_version: "1"
   include_manual_appendix: true
 
