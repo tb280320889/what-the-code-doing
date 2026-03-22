@@ -233,11 +233,15 @@ mod tests {
                     name: "greet".to_string(),
                     kind: ExportKind::Function,
                     line: 1,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 },
                 ExportedSymbol {
                     name: "VERSION".to_string(),
                     kind: ExportKind::Const,
                     line: 5,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 },
             ],
             imports: vec![DependencyEdge {
@@ -313,6 +317,8 @@ mod tests {
             name: "newFunc".to_string(),
             kind: ExportKind::Function,
             line: 10,
+            is_generated: false,
+            confidence: ConfidenceBand::High,
         });
         let fp2 = compute_semantic_fingerprint(&result);
         assert_ne!(fp1, fp2);
@@ -419,6 +425,8 @@ mod tests {
                 name: "newExport".to_string(),
                 kind: ExportKind::Function,
                 line: 10,
+                is_generated: false,
+                confidence: ConfidenceBand::High,
             });
             r
         };

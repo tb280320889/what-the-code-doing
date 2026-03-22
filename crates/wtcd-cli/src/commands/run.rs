@@ -140,7 +140,7 @@ pub fn run_analysis(repo_root: &Path, full: bool) -> wtcd_core::error::Result<()
 
         let source_content = std::fs::read_to_string(file_path).unwrap_or_default();
 
-        let module_id = derive_module_id(&relative, &config.scope.source_roots);
+        let module_id = wtcd_mirror::module::detect_module_id(&relative, &source_content);
 
         match wtcd_mirror::io::generate_and_write_mirror(
             &relative,
@@ -174,6 +174,18 @@ pub fn run_analysis(repo_root: &Path, full: bool) -> wtcd_core::error::Result<()
     }
 
     // 7b. Build and write routing index (D-14, RTIX-01)
+    let source_map: HashMap<String, String> = files_to_parse
+        .iter()
+        .filter_map(|f| {
+            let relative = f
+                .strip_prefix(repo_root)
+                .unwrap_or(f)
+                .to_string_lossy()
+                .to_string();
+            std::fs::read_to_string(f).ok().map(|src| (relative, src))
+        })
+        .collect();
+
     let module_id_map: HashMap<String, String> = files_to_parse
         .iter()
         .map(|f| {
@@ -182,7 +194,8 @@ pub fn run_analysis(repo_root: &Path, full: bool) -> wtcd_core::error::Result<()
                 .unwrap_or(f)
                 .to_string_lossy()
                 .to_string();
-            let module_id = derive_module_id(&relative, &config.scope.source_roots);
+            let source = source_map.get(&relative).map(|s| s.as_str()).unwrap_or("");
+            let module_id = wtcd_mirror::module::detect_module_id(&relative, source);
             (relative, module_id)
         })
         .collect();
@@ -201,6 +214,66 @@ pub fn run_analysis(repo_root: &Path, full: bool) -> wtcd_core::error::Result<()
             routing_index.entries.len(),
             index_path.display()
         );
+    }
+
+    // 7c. Build module aggregation and module mirrors (Phase 7)
+    let grouped = wtcd_mirror::module::group_by_module_id(&file_results, &source_map);
+    let mut modules: Vec<ModuleResult> = grouped
+        .iter()
+        .map(|(module_id, files)| {
+            wtcd_mirror::module::aggregate_module(module_id, files, None, None)
+        })
+        .collect();
+    let graph = wtcd_mirror::module::build_module_graph(&modules);
+    modules = modules
+        .into_iter()
+        .map(|mut m| {
+            let (fan_in, fan_out) = wtcd_mirror::module::fanin_fanout(&graph, &m.module_id);
+            m.fan_in = fan_in;
+            m.fan_out = fan_out;
+            m
+        })
+        .collect();
+
+    if let Err(e) = write_module_mirrors(repo_root, &mirror_config.module_output_dir, &modules) {
+        eprintln!("Warning: failed to write module mirrors: {}", e);
+    }
+
+    // 7d. Build knowledge layer documents (Phase 8)
+    let source_tokens = source_map
+        .values()
+        .map(|s| s.split_whitespace().count())
+        .sum::<usize>();
+    let knowledge = wtcd_mirror::knowledge::build_knowledge_result(&modules, source_tokens);
+    let overview = wtcd_mirror::knowledge::generate_repo_overview(&modules, &knowledge);
+    let depgraph_mermaid = wtcd_mirror::knowledge::generate_module_dep_mermaid(&modules);
+    let export_index = wtcd_mirror::knowledge::generate_export_index(&modules);
+    let clusters = wtcd_mirror::knowledge::community_clusters(&modules);
+    let hotspots = wtcd_mirror::knowledge::hotspot_map_from_drift(
+        &modules
+            .iter()
+            .map(|m| vec![parse_drift(&m.drift_level)])
+            .collect::<Vec<_>>(),
+    );
+    let read_paths = wtcd_mirror::knowledge::suggest_read_paths(&modules, &routing_index);
+    let adrs = modules
+        .iter()
+        .filter_map(wtcd_mirror::knowledge::adr_skeleton_for_module)
+        .collect::<Vec<_>>();
+
+    if let Err(e) = write_knowledge_docs(
+        repo_root,
+        &mirror_config.knowledge_output_dir,
+        &knowledge,
+        &overview,
+        &depgraph_mermaid,
+        &export_index,
+        &clusters,
+        &hotspots,
+        &read_paths,
+        &adrs,
+    ) {
+        eprintln!("Warning: failed to write knowledge docs: {}", e);
     }
 
     // 8. Build summary (D-07)
@@ -244,27 +317,144 @@ pub fn run_analysis(repo_root: &Path, full: bool) -> wtcd_core::error::Result<()
     Ok(())
 }
 
-fn derive_module_id(relative_path: &str, source_roots: &[String]) -> String {
-    let path = std::path::Path::new(relative_path);
-    let components: Vec<_> = path
-        .components()
-        .map(|c| c.as_os_str().to_string_lossy().to_string())
-        .collect();
+fn write_module_mirrors(
+    repo_root: &Path,
+    module_output_dir: &str,
+    modules: &[ModuleResult],
+) -> wtcd_core::error::Result<()> {
+    let module_root = repo_root.join(module_output_dir);
+    std::fs::create_dir_all(&module_root)?;
 
-    if components.is_empty() {
-        return "global".to_string();
+    for module in modules {
+        let module_filename = format!("{}.md", sanitize_module_file_name(&module.module_id));
+        let path = module_root.join(module_filename);
+        let content = format!(
+            "---\nanrsm_version: 1\nartifact_type: module_mirror\nartifact_id: module_mirror:{}\nmodule_id: {}\nlanguage: {}\nsemantic_fingerprint: {}\nfan_in: {}\nfan_out: {}\ndrift_level: {}\n---\n\n## 责任\n{}\n\n## 文件\n{}\n\n## 导出\n{}\n\n## 依赖\n{}\n\n## 副作用\n{}\n",
+            module.module_id,
+            module.module_id,
+            module.language,
+            module.semantic_fingerprint,
+            module.fan_in,
+            module.fan_out,
+            module.drift_level,
+            module.responsibility,
+            if module.files.is_empty() {
+                "-".to_string()
+            } else {
+                module.files.join("\n")
+            },
+            if module.exports.is_empty() {
+                "-".to_string()
+            } else {
+                module.exports.join("\n")
+            },
+            if module.dependencies.is_empty() {
+                "-".to_string()
+            } else {
+                module.dependencies.join("\n")
+            },
+            if module.side_effects.is_empty() {
+                "-".to_string()
+            } else {
+                module.side_effects.join("\n")
+            }
+        );
+        std::fs::write(path, content)?;
     }
 
-    // Skip source root prefix if it matches
-    if source_roots.iter().any(|r| r == &components[0]) {
-        if components.len() > 1 {
-            return components[1].clone();
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+fn write_knowledge_docs(
+    repo_root: &Path,
+    knowledge_output_dir: &str,
+    knowledge: &KnowledgeResult,
+    overview: &str,
+    depgraph_mermaid: &str,
+    export_index: &str,
+    clusters: &[Vec<String>],
+    hotspots: &std::collections::BTreeMap<String, usize>,
+    read_paths: &[String],
+    adrs: &[String],
+) -> wtcd_core::error::Result<()> {
+    let root = repo_root.join(knowledge_output_dir);
+    std::fs::create_dir_all(&root)?;
+
+    let stats = format!(
+        "# Language & File Statistics\n\n- module_count: {}\n- total_files: {}\n- total_exports: {}\n- token_compression_ratio: {:.4}\n- language_distribution: {}\n",
+        knowledge.module_count,
+        knowledge.total_files,
+        knowledge.total_exports,
+        knowledge.token_compression_ratio,
+        knowledge
+            .language_distribution
+            .iter()
+            .map(|(k, v)| format!("{k}:{v}"))
+            .collect::<Vec<_>>()
+            .join(", ")
+    );
+
+    let clusters_doc = format!(
+        "# Semantic Clusters\n\n{}",
+        clusters
+            .iter()
+            .enumerate()
+            .map(|(idx, c)| format!("- cluster_{}: {}", idx + 1, c.join(", ")))
+            .collect::<Vec<_>>()
+            .join("\n")
+    );
+
+    let hotspot_doc = format!(
+        "# Hotspot Map\n\n{}",
+        hotspots
+            .iter()
+            .map(|(k, v)| format!("- {k}: {v}"))
+            .collect::<Vec<_>>()
+            .join("\n")
+    );
+
+    let path_doc = format!(
+        "# Agent Read Paths\n\n{}",
+        if read_paths.is_empty() {
+            "- none".to_string()
+        } else {
+            read_paths
+                .iter()
+                .map(|p| format!("- {}", p))
+                .collect::<Vec<_>>()
+                .join("\n")
+        }
+    );
+
+    std::fs::write(root.join("overview.md"), overview)?;
+    std::fs::write(root.join("module-deps.mmd"), depgraph_mermaid)?;
+    std::fs::write(root.join("export-index.md"), export_index)?;
+    std::fs::write(root.join("stats.md"), stats)?;
+    std::fs::write(root.join("clusters.md"), clusters_doc)?;
+    std::fs::write(root.join("hotspots.md"), hotspot_doc)?;
+    std::fs::write(root.join("read-paths.md"), path_doc)?;
+
+    if !adrs.is_empty() {
+        let adr_root = root.join("adr");
+        std::fs::create_dir_all(&adr_root)?;
+        for (idx, adr) in adrs.iter().enumerate() {
+            std::fs::write(adr_root.join(format!("ADR-{:03}.md", idx + 1)), adr)?;
         }
     }
 
-    // Fallback: use first directory component or global
-    path.parent()
-        .and_then(|p| p.components().next())
-        .map(|c| c.as_os_str().to_string_lossy().to_string())
-        .unwrap_or_else(|| "global".to_string())
+    Ok(())
+}
+
+fn sanitize_module_file_name(module_id: &str) -> String {
+    module_id.replace(['/', ':', '\\'], "__")
+}
+
+fn parse_drift(level: &str) -> wtcd_core::types::ChangeClass {
+    match level.to_uppercase().as_str() {
+        "C3" => wtcd_core::types::ChangeClass::C3,
+        "C2" => wtcd_core::types::ChangeClass::C2,
+        "C1" => wtcd_core::types::ChangeClass::C1,
+        _ => wtcd_core::types::ChangeClass::C0,
+    }
 }

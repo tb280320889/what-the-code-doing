@@ -226,6 +226,15 @@ fn freshness_weight(freshness: &str) -> f64 {
     }
 }
 
+/// Confidence weight for scoring (Phase 11).
+fn confidence_weight(confidence: &str) -> f64 {
+    match confidence {
+        "high" => 1.0,
+        "low" => 0.5,
+        _ => 0.0, // "none" — should be filtered at index build time
+    }
+}
+
 /// Confidence sort value for tie-breaking (D-08).
 fn confidence_sort_value(confidence: &str) -> i32 {
     match confidence {
@@ -275,7 +284,9 @@ pub fn route_query(query: &str, index: &RoutingIndex, top_k: usize) -> RouteOutp
             continue;
         }
 
-        let score = matches as f64 / query_tokens.len() as f64 * freshness_weight(&entry.freshness);
+        let score = matches as f64 / query_tokens.len() as f64
+            * freshness_weight(&entry.freshness)
+            * confidence_weight(&entry.confidence);
 
         results.push(RouteResult {
             source_path: entry.source_path.clone(),
@@ -405,11 +416,15 @@ mod tests {
                         name: "login".to_string(),
                         kind: ExportKind::Function,
                         line: 1,
+                        is_generated: false,
+                        confidence: ConfidenceBand::High,
                     },
                     ExportedSymbol {
                         name: "logout".to_string(),
                         kind: ExportKind::Function,
                         line: 10,
+                        is_generated: false,
+                        confidence: ConfidenceBand::High,
                     },
                 ],
                 imports: vec![DependencyEdge {
@@ -433,6 +448,8 @@ mod tests {
                     name: "formatDate".to_string(),
                     kind: ExportKind::Function,
                     line: 1,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 }],
                 imports: vec![],
                 signatures: vec![],
@@ -609,6 +626,8 @@ mod tests {
                     name: "foo".to_string(),
                     kind: ExportKind::Function,
                     line: 1,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 }],
                 imports: vec![],
                 signatures: vec![],
@@ -623,6 +642,8 @@ mod tests {
                     name: "foo".to_string(),
                     kind: ExportKind::Function,
                     line: 1,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 }],
                 imports: vec![],
                 signatures: vec![],
@@ -650,6 +671,8 @@ mod tests {
                     name: "foo".to_string(),
                     kind: ExportKind::Function,
                     line: 1,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 }],
                 imports: vec![],
                 signatures: vec![],
@@ -664,6 +687,8 @@ mod tests {
                     name: "foo".to_string(),
                     kind: ExportKind::Function,
                     line: 1,
+                    is_generated: false,
+                    confidence: ConfidenceBand::High,
                 }],
                 imports: vec![],
                 signatures: vec![],

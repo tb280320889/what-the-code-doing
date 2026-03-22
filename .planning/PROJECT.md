@@ -10,6 +10,21 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 
 **让 AI Agent 的默认读取行为从"吞源码"变为"先读镜像"，用最小充分上下文完成工程决策。**
 
+## Current Milestone: v0.2.0 Polyglot Adapters
+
+**Goal:** 将 WTCD 语言适配能力从 TS/JS/Python/Go 扩展到 9 种新增语言，并保持与现有镜像、漂移、路由链路的完整一致性。
+
+**Target features:**
+- Rust 语言适配器（解析/提取/测试/CLI 集成）
+- Dart 语言适配器（解析/提取/测试/CLI 集成）
+- Java 语言适配器（解析/提取/测试/CLI 集成）
+- Kotlin 语言适配器（解析/提取/测试/CLI 集成）
+- Swift 语言适配器（解析/提取/测试/CLI 集成）
+- C++ 语言适配器（解析/提取/测试/CLI 集成）
+- C# 语言适配器（解析/提取/测试/CLI 集成）
+- C 语言适配器（解析/提取/测试/CLI 集成）
+- Zig 语言适配器（解析/提取/测试/CLI 集成）
+
 ## Requirements
 
 ### Validated
@@ -23,12 +38,18 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 - [x] Agent 集成：CLI 驱动的读取顺序引导，JSON 结构化输出 — `Validated in Phase 01+04`
 - [x] Rust CLI 分发：crates.io + GitHub Releases 预编译二进制 — `Validated in Phase 01`
 - [x] MCP Server 集成：通过 MCP 协议暴露 WTCD 核心能力给 Agent — `Validated in Phase 999.1`
+- [x] Python 语言适配器：支持函数/类/import/装饰器/`__all__`/`__init__.py` 提取与低置信降级 — `Validated in Phase 05`
+- [x] Go 语言适配器：支持函数/方法/类型/可见性/指令与并发模式提取 — `Validated in Phase 06`
+- [x] 模块级镜像聚合：跨文件导出/依赖/副作用聚合，模块指纹与 fan-in/fan-out 统计 — `Validated in Phase 07`
+- [x] 知识层文档生成：仓库总览、模块依赖图、全局导出索引、热点与 Agent 读取路径建议 — `Validated in Phase 08`
 
-### Active (v2)
+### Active
 
-- [ ] 多语言适配器（Python, Go）
-- [ ] 模块级镜像聚合
-- [ ] 知识层文档生成
+**v0.2.0: Polyglot Adapters milestone scope**
+
+- [ ] 完成 Rust / Dart / Java / Kotlin / Swift / C++ / C# / C / Zig 9 种语言适配器
+- [ ] 每种语言达到完整适配标准：tree-sitter 解析 + 结构化语义提取 + fixtures + 单元/集成回归
+- [ ] 保持与现有 LanguageAdapter 管线、镜像输出、drift/check/route 命令的兼容
 
 ### Out of Scope (v1)
 
@@ -90,7 +111,7 @@ ANRSM 是一套以源码为唯一真相源的仓库语义镜像系统，面向 A
 
 This document evolves at phase transitions and milestone boundaries.
 
-**Current State**: Milestone v1.0 complete — 5 phases, 8 crates, 160 tests, 38/38 requirements satisfied. v1 交付了完整的解析→镜像→漂移检测→路由索引→MCP Server 管线。
+**Current State**: Milestone v0.2.0 initialized — preparing full adapter coverage for 9 additional languages.
 
 **After each milestone** (via `/gsd-complete-milestone`):
 1. Full review of all sections
@@ -99,4 +120,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-21 after v1.0 milestone completion*
+*Last updated: 2026-03-22 after v0.2.0 milestone initialization*

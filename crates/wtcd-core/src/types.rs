@@ -32,6 +32,16 @@ pub struct ExportedSymbol {
     pub name: String,
     pub kind: ExportKind,
     pub line: u32,
+    /// Whether this symbol is from generated/uncertain code
+    #[serde(default)]
+    pub is_generated: bool,
+    /// Per-symbol confidence band
+    #[serde(default = "default_high_confidence")]
+    pub confidence: ConfidenceBand,
+}
+
+fn default_high_confidence() -> ConfidenceBand {
+    ConfidenceBand::High
 }
 
 /// Import kind (D-17)
@@ -96,6 +106,62 @@ pub struct FileResult {
     pub parse_time_ms: u64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_message: Option<String>,
+}
+
+/// Module-level aggregated result (Phase 7)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModuleResult {
+    pub module_id: String,
+    pub language: String,
+    pub files: Vec<String>,
+    pub exports: Vec<String>,
+    pub dependencies: Vec<String>,
+    pub side_effects: Vec<String>,
+    pub responsibility: String,
+    pub semantic_fingerprint: String,
+    pub fan_in: usize,
+    pub fan_out: usize,
+    pub drift_level: String,
+    /// Module-level confidence (min across all files)
+    #[serde(default = "default_high_confidence")]
+    pub confidence: ConfidenceBand,
+}
+
+/// Per-language extraction capability info
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LanguageCapability {
+    /// Language name (e.g., "typescript", "rust")
+    pub language: String,
+    /// Number of files in this language
+    pub file_count: usize,
+    /// Number of modules in this language
+    pub module_count: usize,
+    /// Whether exports extraction is supported
+    pub has_exports: bool,
+    /// Whether imports extraction is supported
+    pub has_imports: bool,
+    /// Whether signatures extraction is supported
+    pub has_signatures: bool,
+    /// Whether side_effects extraction is supported
+    pub has_side_effects: bool,
+    /// Confidence distribution: (high, low, none) counts
+    pub confidence_distribution: (usize, usize, usize),
+}
+
+/// Repository-level knowledge output (Phase 8)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KnowledgeResult {
+    pub module_count: usize,
+    pub language_distribution: std::collections::BTreeMap<String, usize>,
+    pub total_files: usize,
+    pub total_exports: usize,
+    pub token_compression_ratio: f64,
+    /// Per-language extraction capability matrix
+    #[serde(default)]
+    pub language_matrix: std::collections::BTreeMap<String, LanguageCapability>,
+    /// Module IDs with low or no confidence
+    #[serde(default)]
+    pub low_confidence_modules: Vec<String>,
 }
 
 /// Run-level summary statistics (D-07)

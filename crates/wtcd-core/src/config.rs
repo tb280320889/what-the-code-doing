@@ -32,6 +32,10 @@ pub struct ScopeConfig {
 pub struct MirrorConfig {
     #[serde(default = "default_mirror_output_dir")]
     pub output_dir: String,
+    #[serde(default = "default_module_output_dir")]
+    pub module_output_dir: String,
+    #[serde(default = "default_knowledge_output_dir")]
+    pub knowledge_output_dir: String,
     #[serde(default = "default_fp_version")]
     pub fp_version: String,
     #[serde(default)]
@@ -40,6 +44,14 @@ pub struct MirrorConfig {
 
 fn default_mirror_output_dir() -> String {
     "mirror/file".to_string()
+}
+
+fn default_module_output_dir() -> String {
+    "mirror/module".to_string()
+}
+
+fn default_knowledge_output_dir() -> String {
+    "mirror/knowledge".to_string()
 }
 
 fn default_fp_version() -> String {

@@ -1,165 +1,142 @@
-# Requirements: ANRSM
+# Requirements: WTCD (What The Code Doing)
 
 **Defined:** 2026-03-21
 **Core Value:** 让 AI Agent 的默认读取行为从"吞源码"变为"先读镜像"，用最小充分上下文完成工程决策。
 
-## v1 Requirements
+## v1 Requirements (Validated)
 
-Requirements for initial release (M0-M3). Each maps to roadmap phases.
+All 38 v1 requirements satisfied in Milestone v1.0. See v1.0-MILESTONE-AUDIT.md.
 
 ### Core Engine
 
-- [x] **CORE-01**: CLI 可通过 `cargo install anrsm` 或 GitHub Releases 安装为单二进制
-- [x] **CORE-02**: CLI 支持 `anrsm init` 命令，在目标仓库初始化 ANRSM 配置和目录结构 — Phase 1
-- [x] **CORE-03**: CLI 支持 `anrsm run` 命令，对目标仓库执行全量扫描和镜像生成 — Phase 1+2
-- [x] **CORE-04**: CLI 支持 `anrsm check` 命令，检测当前变更集的镜像漂移 — Phase 3
-- [x] **CORE-05**: CLI 支持 `anrsm route <task>` 命令，将任务路由到候选模块和文件 — Phase 4
+- [x] **CORE-01**: CLI 可通过 `cargo install wtcd` 或 GitHub Releases 安装为单二进制
+- [x] **CORE-02**: CLI 支持 `wtcd init` 命令，在目标仓库初始化配置和目录结构 — Phase 1
+- [x] **CORE-03**: CLI 支持 `wtcd run` 命令，对目标仓库执行全量扫描和镜像生成 — Phase 1+2
+- [x] **CORE-04**: CLI 支持 `wtcd check` 命令，检测当前变更集的镜像漂移 — Phase 3
+- [x] **CORE-05**: CLI 支持 `wtcd route <task>` 命令，将任务路由到候选模块和文件 — Phase 4
 - [x] **CORE-06**: CLI 输出 JSON 格式，可被 Agent 直接解析
 
-### Scope Manager
+### Scope / Language / Mirror / Drift / Gate / Index / MCP
 
-- [x] **SCOP-01**: 从 `anrsm.yaml` 配置文件读取源码根目录、排除规则和模块映射
-- [x] **SCOP-02**: 确定性地枚举纳入范围的文件清单
-- [x] **SCOP-03**: 支持 glob 模式的纳入/排除规则
+- [x] All 32 remaining v1 requirements (SCOP-01~03, LANG-01~06, MIRR-01~05, FP-01~03, DRFT-01~04, GATE-01~05, RTIX-01~03, INCR-01~03)
 
-### Language Adapter (TypeScript/JS)
+## v0.1.1 Requirements (Validated)
 
-- [x] **LANG-01**: 使用 tree-sitter 解析 TypeScript 和 JavaScript 文件
-- [x] **LANG-02**: 提取导出符号（函数、类、类型、常量）
-- [x] **LANG-03**: 提取依赖边（import/require 语句）
-- [x] **LANG-04**: 提取函数签名和参数类型
-- [x] **LANG-05**: 识别副作用（I/O、网络、存储、日志调用）
-- [x] **LANG-06**: 对解析失败的文件标记低置信度并优雅降级
+All 40 v0.1.1 requirements satisfied in Milestone v0.1.1. See `.planning/v0.1.1-MILESTONE-AUDIT.md`.
 
-### Mirror Generator
+## v0.2.0 Requirements
 
-- [x] **MIRR-01**: 生成符合 `mirror-header.schema.json` 的文件镜像（YAML Front Matter + Markdown 正文） — Phase 2
-- [x] **MIRR-02**: 镜像正文包含规范定义的 8 个标准段落（职责、对外契约、输入与前置条件、状态与控制流、副作用与外部依赖、关键不变量与风险、变更影响、何时必须展开源码） — Phase 2
-- [x] **MIRR-03**: 镜像路径按规则映射：`mirror/file/<source_relative_path>.md` — Phase 2
-- [x] **MIRR-04**: 计算 source_fingerprint（基于源码内容的 SHA-256） — Phase 2
-- [x] **MIRR-05**: 计算 semantic_fingerprint（基于结构化语义对象的 SHA-256，排除非语义噪声） — Phase 2
+v0.2.0 里程碑需求：新增 Rust、Dart、Java、Kotlin、Swift、C++、C#、C、Zig 九种语言完整适配，并确保聚合/路由/门禁链路一致可靠。
 
-### Fingerprint Engine
+### Adapter Coverage
 
-- [x] **FP-01**: source_fingerprint 在源码任何文本变化时变化 — Phase 2
-- [x] **FP-02**: semantic_fingerprint 在纯格式化/注释/空白变化时保持稳定 — Phase 2
-- [x] **FP-03**: 指纹算法可版本化，支持 `fp_version` 字段 — Phase 2
+- [ ] **ADPT-01**: User can parse Rust files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-02**: User can parse Dart files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-03**: User can parse Java files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-04**: User can parse Kotlin files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-05**: User can parse Swift files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-06**: User can parse C++ files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-07**: User can parse C# files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-08**: User can parse C files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-09**: User can parse Zig files via `wtcd run` and extract exports/imports/signatures/side effects with confidence grading
+- [ ] **ADPT-10**: User can see scanner coverage for all new language extensions so files are routed to the correct adapters
+- [ ] **ADPT-11**: User can rely on adapter registry auto-selection so no new CLI command is needed for new languages
+- [ ] **ADPT-12**: User can trust each new adapter via fixtures + unit tests + integration tests for normal/broken syntax and representative language constructs
 
-### Drift Detection
+### Aggregation Consistency
 
-- [x] **DRFT-01**: 基于 Git diff 获取变更集 — Phase 3
-- [x] **DRFT-02**: 区分 C0（Non-material）、C1（Local Material）、C2（Contract Material）、C3（Systemic Material）四类变更 — Phase 3
-- [x] **DRFT-03**: 输出符合 `drift-report.schema.json` 的漂移报告 — Phase 3
-- [x] **DRFT-04**: 对变更文件的受影响邻域进行扩展分析 — Phase 3
+- [ ] **CONS-01**: User can get language-aware import normalization in depgraph so incremental impact expansion is accurate across all supported languages
+- [ ] **CONS-02**: User can see module aggregation results stay semantically consistent across TS/JS/Python/Go and the 9 new languages
+- [ ] **CONS-03**: User can get stable drift classification by using explicit analysis context for conditional compilation/preprocessor-sensitive languages
+- [ ] **CONS-04**: User can see generated or uncertain symbols explicitly marked (with confidence impact) instead of silently treated as certain facts
 
-### CI Gate
+### Consumer Quality (Route/Knowledge)
 
-- [x] **GATE-01**: 支持 pre-commit hook 模式 — Phase 3
-- [x] **GATE-02**: 支持 `anrsm gate` 命令，可被 CI pipeline 调用 — Phase 3
-- [x] **GATE-03**: 可配置的门禁策略（fail_on / warn_on 按漂移级别） — Phase 3
-- [x] **GATE-04**: 输出标准失败码（ANRSM-001 到 ANRSM-010） — Phase 3
-- [x] **GATE-05**: 初期支持 warn-only 模式，避免误报导致 adoption 失败 — Phase 3
+- [ ] **ROUT-01**: User can query routes with language and confidence signals to reduce false-positive candidate files
+- [ ] **ROUT-02**: User can inspect a language capability matrix in knowledge output to understand per-language extraction coverage
+- [ ] **ROUT-03**: User can see low-confidence and generated/uncertain areas explicitly surfaced in knowledge docs
+- [ ] **ROUT-04**: User can trust route quality after adapter expansion via regression checks on representative multi-language repositories
 
-### Routing Index
+### Stability Gates
 
-- [x] **RTIX-01**: 生成 routing_index，包含 artifact_id、module_id、semantic_keywords、exported_symbols — Phase 4
-- [x] **RTIX-02**: `anrsm route <task>` 命令从自然语言任务映射到候选模块和文件 — Phase 4
-- [x] **RTIX-03**: 支持 top_k 限制返回数量 — Phase 4
+- [ ] **STAB-01**: User can rely on CI matrix checks that validate `run/check/route` across all 9 new languages
+- [ ] **STAB-02**: User can rely on performance budgets for parsing and incremental updates with measurable thresholds
+- [ ] **STAB-03**: User can rely on parser/grammar version locks plus upgrade playbook to avoid uncontrolled ABI drift
+- [ ] **STAB-04**: User can trust pipeline integrity because tests catch scanner-extension and adapter-registry mismatch before merge
 
-### Incremental Update
-
-- [x] **INCR-01**: 基于 Git diff 驱动的增量更新，不默认全量重扫 — Phase 3
-- [x] **INCR-02**: 仅重新解析变更文件及其受影响邻域 — Phase 3
-- [x] **INCR-03**: 支持 `anrsm run --full` 触发全量重建 — Phase 3
-
-## v2 Requirements
+## Future Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
 
-### Module Mirror
+### Cross-Language
 
-- **MODL-01**: 从文件镜像聚合生成模块级镜像
-- **MODL-02**: 模块镜像包含职责、边界、契约、依赖、状态、入口文件
-- **MODL-03**: 模块规则可配置（module_rules in anrsm.yaml）
+- **CROSS-01**: Cross-language type reference (protobuf/OpenAPI bridge)
+- **CROSS-02**: Unified module discovery across mixed-language repos
 
-### Multi-Language
+### Advanced Analysis
 
-- **MULT-01**: Python 语言适配器
-- **MULT-02**: Go 语言适配器
-- **MULT-03**: 适配器插件化架构（trait-based registry）
+- **ADV-01**: CGo analysis (complexity too high for v0.1.1)
+- **ADV-02**: Generic constraint deep analysis
+- **ADV-03**: Complete UML diagram generation
 
-### Knowledge Layer
+### Polyglot Advanced
 
-- **KNOW-01**: 从镜像和索引编译人类知识层文档
-- **KNOW-02**: 支持 architecture、features、operations、onboarding 四类知识文档
-- **KNOW-03**: 知识文档保留来源追溯
-
-### Agent Integration
-
-- **AGNT-01**: Agent 读取顺序验证工具
-- **AGNT-02**: 路由基准测试集
-- **AGNT-03**: Agent 行为度量和报告
+- **POLY-01**: Cross-language deep type resolution (compiler/LSP assisted) for high-confidence symbol binding
+- **POLY-02**: Full macro/template/preprocessor expansion modeling for Rust/C/C++ level semantic depth
+- **POLY-03**: High-precision FFI and interop edge modeling (JNI/PInvoke/extern/cgo-style patterns)
 
 ## Out of Scope
 
+Explicitly excluded. Documented to prevent scope creep.
+
 | Feature | Reason |
 |---------|--------|
-| Web UI / Dashboard | CLI 优先，UI 是后续增强 |
-| 多仓库全局图 | v1 聚焦单仓场景 |
-| 实时后台常驻服务 | CLI 按需运行，不做 daemon |
-| 任意语言零成本支持 | 先 TS/JS，后续按需扩展 |
-| 自动修复镜像质量问题 | 低置信度人工复核 |
-| 替代编译/测试/Lint/静态分析 | ANRSM 是补充层，不是替代 |
-| LLM 直接生成镜像事实 | 必须先结构化提取，LLM 只做压缩 |
+| LLM-generated free text | Violates A4 axiom — only verifiable facts, no "why" |
+| Wiki-style editing | Dual truth source risk (R1) |
+| Running Python/Go code | Security risk, violates "pure parsing" principle |
+| Dynamic import analysis | Variables cannot be statically resolved |
+| Type inference | Full type checker domain (mypy/pyright) |
+| Compiler-level semantic binding in v0.2.0 | Too expensive for this milestone; defer to POLY-01 |
+| Full macro/template/preprocessor expansion in v0.2.0 | High complexity and toolchain coupling; defer to POLY-02 |
+| Web UI | v1 CLI-only, no web interface |
+| Real-time background service | CLI on-demand execution only |
 
 ## Traceability
 
+Which phases cover which requirements. Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1: Foundation | ✅ Complete |
-| CORE-02 | Phase 1: Foundation | ✅ Complete |
-| CORE-03 | Phase 1+2: Foundation + Mirror | ✅ Complete |
-| CORE-04 | Phase 3: Drift + Gate | ✅ Complete |
-| CORE-05 | Phase 4: Index + Route | ✅ Complete |
-| CORE-06 | Phase 1: Foundation | ✅ Complete |
-| SCOP-01 | Phase 1: Foundation | ✅ Complete |
-| SCOP-02 | Phase 1: Foundation | ✅ Complete |
-| SCOP-03 | Phase 1: Foundation | ✅ Complete |
-| LANG-01 | Phase 1: Foundation | ✅ Complete |
-| LANG-02 | Phase 1: Foundation | ✅ Complete |
-| LANG-03 | Phase 1: Foundation | ✅ Complete |
-| LANG-04 | Phase 1: Foundation | ✅ Complete |
-| LANG-05 | Phase 1: Foundation | ✅ Complete |
-| LANG-06 | Phase 1: Foundation | ✅ Complete |
-| MIRR-01 | Phase 2: Mirror + Fingerprint | ✅ Complete |
-| MIRR-02 | Phase 2: Mirror + Fingerprint | ✅ Complete |
-| MIRR-03 | Phase 2: Mirror + Fingerprint | ✅ Complete |
-| MIRR-04 | Phase 2: Mirror + Fingerprint | ✅ Complete |
-| MIRR-05 | Phase 2: Mirror + Fingerprint | ✅ Complete |
-| FP-01 | Phase 2: Mirror + Fingerprint | ✅ Complete |
-| FP-02 | Phase 2: Mirror + Fingerprint | ✅ Complete |
-| FP-03 | Phase 2: Mirror + Fingerprint | ✅ Complete |
-| DRFT-01 | Phase 3: Drift + Gate | ✅ Complete |
-| DRFT-02 | Phase 3: Drift + Gate | ✅ Complete |
-| DRFT-03 | Phase 3: Drift + Gate | ✅ Complete |
-| DRFT-04 | Phase 3: Drift + Gate | ✅ Complete |
-| GATE-01 | Phase 3: Drift + Gate | ✅ Complete |
-| GATE-02 | Phase 3: Drift + Gate | ✅ Complete |
-| GATE-03 | Phase 3: Drift + Gate | ✅ Complete |
-| GATE-04 | Phase 3: Drift + Gate | ✅ Complete |
-| GATE-05 | Phase 3: Drift + Gate | ✅ Complete |
-| RTIX-01 | Phase 4: Index + Route | ✅ Complete |
-| RTIX-02 | Phase 4: Index + Route | ✅ Complete |
-| RTIX-03 | Phase 4: Index + Route | ✅ Complete |
-| INCR-01 | Phase 3: Drift + Gate | ✅ Complete |
-| INCR-02 | Phase 3: Drift + Gate | ✅ Complete |
-| INCR-03 | Phase 3: Drift + Gate | ✅ Complete |
+| ADPT-01 | Phase 9 | Pending |
+| ADPT-02 | Phase 9 | Pending |
+| ADPT-03 | Phase 9 | Pending |
+| ADPT-04 | Phase 9 | Pending |
+| ADPT-05 | Phase 9 | Pending |
+| ADPT-06 | Phase 9 | Pending |
+| ADPT-07 | Phase 9 | Pending |
+| ADPT-08 | Phase 9 | Pending |
+| ADPT-09 | Phase 9 | Pending |
+| ADPT-10 | Phase 9 | Pending |
+| ADPT-11 | Phase 9 | Pending |
+| ADPT-12 | Phase 12 | Pending |
+| CONS-01 | Phase 10 | Pending |
+| CONS-02 | Phase 10 | Pending |
+| CONS-03 | Phase 10 | Pending |
+| CONS-04 | Phase 10 | Pending |
+| ROUT-01 | Phase 11 | Pending |
+| ROUT-02 | Phase 11 | Pending |
+| ROUT-03 | Phase 11 | Pending |
+| ROUT-04 | Phase 12 | Pending |
+| STAB-01 | Phase 12 | Pending |
+| STAB-02 | Phase 12 | Pending |
+| STAB-03 | Phase 12 | Pending |
+| STAB-04 | Phase 12 | Pending |
 
 **Coverage:**
-- v1 requirements: 38 total
-- Satisfied: 38/38 (100%)
-- Unmapped: 0 ✓
+- v0.2.0 requirements: 24 total
+- Mapped to phases: 24
+- Unmapped: 0 ✅
 
 ---
 *Requirements defined: 2026-03-21*
-*Last updated: 2026-03-21 after initial definition*
+*Last updated: 2026-03-22 after v0.2.0 requirement definition draft*

@@ -90,6 +90,7 @@ impl ReverseDepGraph {
     /// Resolve a relative import specifier to a canonical path
     /// E.g., "./utils" from "src/app.ts" -> "src/utils.ts"
     /// E.g., "../lib/helper" from "src/components/Button.ts" -> "src/lib/helper.ts"
+    /// E.g., "./mod" from "src/main.rs" -> "src/mod.rs"
     fn resolve_import_path(importer_path: &str, import_source: &str) -> String {
         use std::path::Path;
 
@@ -102,18 +103,17 @@ impl ReverseDepGraph {
 
             let mut path_str = normalized.to_string_lossy().to_string();
 
-            // Add extension if missing — try .ts first, then .js, then .tsx, .jsx
-            if Path::new(&path_str).extension().is_none() {
-                for ext in &[".ts", ".tsx", ".js", ".jsx"] {
-                    let with_ext = format!("{}{}", path_str, ext);
-                    // We can't check filesystem here (dep graph is in-memory),
-                    // so we add the most likely extension
-                    if path_str.contains("/index") {
-                        // Already an index import, don't add extension
-                    } else {
-                        path_str = with_ext;
-                        break;
-                    }
+            // Add extension if missing — infer from importer's language
+            if Path::new(&path_str).extension().is_none() && !path_str.contains("/index") {
+                let importer_ext = Path::new(importer_path)
+                    .extension()
+                    .and_then(|e| e.to_str())
+                    .unwrap_or("");
+
+                let candidates = Self::extension_candidates(importer_ext);
+                if !candidates.is_empty() {
+                    // Use first candidate as default (we can't check filesystem in-memory)
+                    path_str = format!("{}{}", path_str, candidates[0]);
                 }
             }
 
@@ -121,6 +121,39 @@ impl ReverseDepGraph {
         } else {
             // Package import (e.g., "lodash", "@scope/pkg") — keep as-is
             import_source.to_string()
+        }
+    }
+
+    /// Return extension candidates for import resolution based on the importer file's extension.
+    /// First entry is the default when no filesystem check is possible.
+    fn extension_candidates(importer_ext: &str) -> &'static [&'static str] {
+        match importer_ext {
+            // TypeScript/JavaScript
+            "ts" | "tsx" | "js" | "jsx" => &[".ts", ".tsx", ".js", ".jsx"],
+            // Rust
+            "rs" => &[".rs"],
+            // Python
+            "py" => &[".py"],
+            // Go
+            "go" => &[".go"],
+            // C
+            "c" => &[".c", ".h"],
+            // C++
+            "cpp" | "cc" | "cxx" | "hpp" | "hh" | "hxx" => &[".cpp", ".cc", ".h", ".hpp"],
+            // C#
+            "cs" => &[".cs"],
+            // Dart
+            "dart" => &[".dart"],
+            // Java
+            "java" => &[".java"],
+            // Kotlin
+            "kt" | "kts" => &[".kt", ".kts"],
+            // Swift
+            "swift" => &[".swift"],
+            // Zig
+            "zig" => &[".zig"],
+            // Unknown — fall back to TS/JS
+            _ => &[".ts", ".tsx", ".js", ".jsx"],
         }
     }
 }
