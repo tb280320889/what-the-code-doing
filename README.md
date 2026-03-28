@@ -1,5 +1,7 @@
 # AI Native Repo Semantic Mirror (ANRSM) 开发指导文档集
 
+[![gitcgr](https://gitcgr.com/badge/tb280320889/what-the-code-doing.svg)](https://gitcgr.com/tb280320889/what-the-code-doing)
+
 状态：v1 设计母稿  
 读者：首次接触 ANRSM 概念的架构师、资深工程师、基础设施工程师、AI Agent 平台工程师  
 用途：作为立项、系统设计、原型开发、规范评审、CI 接入、Agent 工作流集成的统一开发依据
